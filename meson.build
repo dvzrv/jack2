@@ -570,35 +570,25 @@ lib_audioadapter = library('audioadapter',
         gnu_symbol_visibility: symbol_visibility_audioadapter)
 
 # headers
-headers_jack = [
-  'control.h',
-  'intclient.h',
-  'jack.h',
-  'jslist.h',
-  'metadata.h',
-  'midiport.h',
-  'net.h',
-  'ringbuffer.h',
-  'session.h',
-  'statistics.h',
-  'systemdeps.h',
-  'thread.h',
-  'transport.h',
-  'types.h',
-  'uuid.h',
-  'weakjack.h',
-  'weakmacros.h',
-]
-
-foreach header : headers_jack
-  configure_file(
-    input: join_paths('common/jack/', header),
-    output: header,
-    copy: true,
-    install: true,
-    install_dir: join_paths(get_option('prefix'), get_option('includedir'))
-  )
-endforeach
+install_headers(
+  'common/jack/control.h',
+  'common/jack/intclient.h',
+  'common/jack/jack.h',
+  'common/jack/jslist.h',
+  'common/jack/metadata.h',
+  'common/jack/midiport.h',
+  'common/jack/net.h',
+  'common/jack/ringbuffer.h',
+  'common/jack/session.h',
+  'common/jack/statistics.h',
+  'common/jack/systemdeps.h',
+  'common/jack/thread.h',
+  'common/jack/transport.h',
+  'common/jack/types.h',
+  'common/jack/uuid.h',
+  'common/jack/weakjack.h',
+  'common/jack/weakmacros.h',
+  subdir: 'jack')
 
 # pkgconfig
 pkg = import('pkgconfig')
