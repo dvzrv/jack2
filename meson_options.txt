@@ -1,4 +1,5 @@
 option('alsa', type: 'feature', value: 'auto', description: 'ALSA support')
+option('autostart-method', type: 'string', value: 'classic', description: 'Set client autostart method (classic or dbus)')
 option('dbus', type: 'feature', value: 'auto', description: 'D-Bus support')
 option('ffado', type: 'feature', value: 'auto', description: 'FFADO support')
 option('systemd', type: 'feature', value: 'auto', description: 'Systemd integration')
