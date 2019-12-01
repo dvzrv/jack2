@@ -149,7 +149,7 @@ src_jack_server_windows = [
   'windows/JackNetWinSocket.cpp']
 
 # sources for libjacknet
-src_jack_net = [
+src_jacknet = [
   'common/JackNetAPI.cpp',
   'common/JackNetInterface.cpp',
   'common/JackNetTool.cpp',
@@ -159,7 +159,7 @@ src_jack_net = [
   'common/JackResampler.cpp',
   'common/JackGlobals.cpp',
   'common/ringbuffer.c']
-src_jack_net_posix = [
+src_jacknet_posix = [
   'posix/JackNetUnixSocket.cpp',
   'posix/JackPosixThread.cpp',
   'posix/JackPosixMutex.cpp']
@@ -236,6 +236,68 @@ src_jackd_posix = [
   'posix/JackPosixThread.cpp',
 ]
 
+# sources for jack/jack_dummy
+src_jack_dummy = [
+  'common/JackDummyDriver.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jack_dummy_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
+# sources for jack/jack_loopback
+src_jack_loopback = [
+  'common/JackLoopbackDriver.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jack_loopback_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
+# sources for jack/jack_net
+src_jack_net = [
+  'common/JackNetDriver.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jack_net_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
+# sources for jack/jack_netone
+src_jack_netone = [
+  'common/JackNetOneDriver.cpp',
+  'common/netjack.c',
+  'common/netjack_packet.c',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jack_netone_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
+# sources for jack/jack_proxy
+src_jack_proxy = [
+  'common/JackProxyDriver.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jack_proxy_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
 
@@ -243,7 +305,7 @@ deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
 deps_jack_server = [dep_threads, dep_celt, dep_opus, lib_db]
 
 # dependencies for libjacknet
-deps_jack_net = [dep_threads, dep_celt, dep_opus, dep_samplerate]
+deps_jacknet = [dep_threads, dep_celt, dep_opus, dep_samplerate]
 
 # dependencies for jack/netmanager
 deps_netmanager = [dep_threads]
@@ -259,6 +321,21 @@ deps_audioadapter = [dep_threads, dep_samplerate]
 
 # dependencies for jackd
 deps_jackd = [dep_threads]
+
+# dependencies for jack/jack_dummy
+deps_jack_dummy = [dep_threads]
+
+# dependencies for jack/jack_loopback
+deps_jack_loopback = [dep_threads]
+
+# dependencies for jack/jack_net
+deps_jack_net = [dep_threads]
+
+# dependencies for jack/jack_netone
+deps_jack_netone = [dep_celt, dep_samplerate, dep_threads]
+
+# dependencies for jack/jack_proxy
+deps_jack_proxy = [dep_threads]
 
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
@@ -298,12 +375,12 @@ if os == 'linux'
   link_flags_jack_server = []
   symbol_visibility_jack_server = 'hidden'
   # libjacknet
-  src_jack_net_linux = ['linux/JackLinuxTime.c']
-  src_jack_net += src_jack_net_posix + src_jack_net_linux
-  include_jack_net = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
-  deps_jack_net += [lib_rt]
-  link_flags_jack_net = []
-  symbol_visibility_jack_net = 'hidden'
+  src_jacknet_linux = ['linux/JackLinuxTime.c']
+  src_jacknet += src_jacknet_posix + src_jacknet_linux
+  include_jacknet = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
+  deps_jacknet += [lib_rt]
+  link_flags_jacknet = []
+  symbol_visibility_jacknet = 'hidden'
   # jack/netmanager
   src_netmanager_linux = ['linux/JackLinuxTime.c']
   src_netmanager += src_netmanager_posix + src_netmanager_linux
@@ -354,6 +431,37 @@ if os == 'linux'
     deps_jackd += [dep_dbus]
   endif
   link_flags_jackd = []
+  # jack/jack_dummy
+  src_jack_dummy_linux = ['linux/JackLinuxTime.c']
+  src_jack_dummy += src_jack_dummy_posix + src_jack_dummy_linux
+  include_jack_dummy = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  link_flags_jack_dummy = []
+  symbol_visibility_jack_dummy = 'default'
+  # jack/jack_loopback
+  src_jack_loopback_linux = ['linux/JackLinuxTime.c']
+  src_jack_loopback += src_jack_loopback_posix + src_jack_loopback_linux
+  include_jack_loopback = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  link_flags_jack_loopback = []
+  symbol_visibility_jack_loopback = 'default'
+  # jack/jack_net
+  src_jack_net_linux = ['linux/JackLinuxTime.c']
+  src_jack_net += src_jack_net_posix + src_jack_net_linux
+  include_jack_net = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  link_flags_jack_net = []
+  symbol_visibility_jack_net = 'default'
+  # jack/jack_netone
+  src_jack_netone_linux = ['linux/JackLinuxTime.c']
+  src_jack_netone += src_jack_netone_posix + src_jack_netone_linux
+  include_jack_netone = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  link_flags_jack_netone = []
+  symbol_visibility_jack_netone = 'default'
+  # jack/jack_proxy
+  src_jack_proxy_linux = ['linux/JackLinuxTime.c']
+  src_jack_proxy += src_jack_proxy_posix + src_jack_proxy_linux
+  include_jack_proxy = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_proxy += [lib_dl]
+  link_flags_jack_proxy = []
+  symbol_visibility_jack_proxy = 'default'
 endif
 
 if os == 'sunos'
@@ -381,12 +489,12 @@ if os == 'sunos'
   link_flags_jack_server = ['-lnsl', '-lsocket']
   symbol_visibility_jack_server = 'default'
   # libjacknet
-  src_jack_net_sunos = ['solaris/JackSolarisTime.c']
-  src_jack_net += src_jack_net_posix + src_jack_net_sunos
+  src_jacknet_sunos = ['solaris/JackSolarisTime.c']
+  src_jacknet += src_jacknet_posix + src_jacknet_sunos
   include_jack_server = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
-  deps_jack_net += [lib_rt]
-  link_flags_jack_net = []
-  symbol_visibility_jack_net = 'hidden'
+  deps_jacknet += [lib_rt]
+  link_flags_jacknet = []
+  symbol_visibility_jacknet = 'hidden'
   # netmanager
   src_netmanager_sunos = ['solaris/JackSolarisTime.c']
   src_netmanager += src_netmanager_posix + src_netmanager_sunos
@@ -424,6 +532,37 @@ if os == 'sunos'
   include_jackd = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
   deps_jackd += [lib_dl]
   link_flags_jackd = []
+  # jack/jack_dummy
+  src_jack_dummy_sunos = ['solaris/JackSolarisTime.c']
+  src_jack_dummy += src_jack_dummy_posix + src_jack_dummy_sunos
+  include_jack_dummy = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
+  link_flags_jack_dummy = []
+  symbol_visibility_jack_dummy = 'default'
+  # jack/jack_loopback
+  src_jack_loopback_sunos = ['solaris/JackSolarisTime.c']
+  src_jack_loopback += src_jack_loopback_posix + src_jack_loopback_sunos
+  include_jack_loopback = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
+  link_flags_jack_loopback = []
+  symbol_visibility_jack_loopback = 'default'
+  # jack/jack_net
+  src_jack_net_sunos = ['solaris/JackSolarisTime.c']
+  src_jack_net += src_jack_net_posix + src_jack_net_sunos
+  include_jack_net = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
+  link_flags_jack_net = []
+  symbol_visibility_jack_net = 'default'
+  # jack/jack_netone
+  src_jack_net_sunos = ['solaris/JackSolarisTime.c']
+  src_jack_netone += src_jack_netone_posix + src_jack_netone_sunos
+  include_jack_netone = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
+  link_flags_jack_netone = []
+  symbol_visibility_jack_netone = 'default'
+  # jack/jack_proxy
+  src_jack_proxy_sunos = ['solaris/JackSolarisTime.c']
+  src_jack_proxy += src_jack_proxy_posix + src_jack_proxy_sunos
+  include_jack_proxy = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
+  deps_jack_proxy += [lib_dl]
+  link_flags_jack_proxy = []
+  symbol_visibility_jack_proxy = 'default'
 endif
 
 if os == 'darwin'
@@ -453,12 +592,12 @@ if os == 'darwin'
   link_flags_jack_server = ['-single_module']
   symbol_visibility_jack_server = 'hidden'
   # libjacknet
-  src_jack_net_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
-  src_jack_net += src_jack_net_posix + src_jack_net_darwin
+  src_jacknet_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_jacknet += src_jacknet_posix + src_jacknet_darwin
   include_jack_server = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'macosx/RPC', 'posix')
-  deps_jack_net += [dep_coreaudio]
-  link_flags_jack_net = ['-single_module']
-  symbol_visibility_jack_net = 'hidden'
+  deps_jacknet += [dep_coreaudio]
+  link_flags_jacknet = ['-single_module']
+  symbol_visibility_jacknet = 'hidden'
   # jack/netmanager
   src_netmanager_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_netmanager += src_netmanager_posix + src_netmanager_darwin
@@ -492,6 +631,37 @@ if os == 'darwin'
   include_jackd = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
   deps_jackd += [lib_dl]
   link_flags_jackd = []
+  # jack/jack_dummy
+  src_jack_dummy_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_jack_dummy += src_jack_dummy_posix + src_jack_dummy_darwin
+  include_jack_dummy = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  link_flags_jack_dummy = []
+  symbol_visibility_jack_dummy = 'default'
+  # jack/jack_loopback
+  src_jack_loopback_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_jack_loopback += src_jack_loopback_posix + src_jack_loopback_darwin
+  include_jack_loopback = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  link_flags_jack_loopback = []
+  symbol_visibility_jack_loopback = 'default'
+  # jack/jack_net
+  src_jack_net_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_jack_net += src_jack_net_posix + src_jack_net_darwin
+  include_jack_net = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  link_flags_jack_net = []
+  symbol_visibility_jack_net = 'default'
+  # jack/jack_netone
+  src_jack_netone_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_jack_netone += src_jack_netone_posix + src_jack_netone_darwin
+  include_jack_netone = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  link_flags_jack_netone = []
+  symbol_visibility_jack_netone = 'default'
+  # jack/jack_proxy
+  src_jack_proxy_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_jack_proxy += src_jack_proxy_posix + src_jack_proxy_sunos
+  include_jack_proxy = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_proxy += [lib_dl]
+  link_flags_jack_proxy = []
+  symbol_visibility_jack_proxy = 'default'
 endif
 
 if os == 'windows'
@@ -514,16 +684,16 @@ if os == 'windows'
   link_flags_jack_server = []
   symbol_visibility_jack_server = 'default'
   # libjacknet
-  src_jack_net_windows = [
+  src_jacknet_windows = [
     'windows/JackNetWinSocket.cpp',
     'windows/JackWinThread.cpp',
     'windows/JackMMCSS.cpp',
     'windows/JackWinTime.c']
-  src_jack_net += src_jack_net_windows
+  src_jacknet += src_jacknet_windows
   include_jack_server = include_directories('.', 'common/jack', 'common', 'windows')
-  deps_jack_net += [dep_winmm, dep_ws2_32]
-  link_flags_jack_net = []
-  symbol_visibility_jack_net = 'default'
+  deps_jacknet += [dep_winmm, dep_ws2_32]
+  link_flags_jacknet = []
+  symbol_visibility_jacknet = 'default'
   # jack/netmanager
   src_netmanager_windows = [
     'windows/JackNetWinSocket.cpp',
@@ -577,6 +747,61 @@ if os == 'windows'
   src_jackd += src_jackd_windows
   include_jackd = include_directories('.', 'common/jack', 'common', 'windows',)
   link_flags_jackd = []
+  # jack/jack_dummy
+  src_jack_dummy_windows = [
+    'windows/JackNetWinSocket.cpp',
+    'windows/JackWinThread.cpp',
+    'windows/JackMMCSS.cpp',
+    'windows/JackWinTime.c',
+  ]
+  src_jack_dummy += src_jack_dummy_posix + src_jack_dummy_windows
+  include_jack_dummy = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_dummy = []
+  symbol_visibility_jack_dummy = 'default'
+  # jack/jack_loopback
+  src_jack_loopback_windows = [
+    'windows/JackNetWinSocket.cpp',
+    'windows/JackWinThread.cpp',
+    'windows/JackMMCSS.cpp',
+    'windows/JackWinTime.c',
+  ]
+  src_jack_loopback += src_jack_loopback_posix + src_jack_loopback_windows
+  include_jack_loopback = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_loopback = []
+  symbol_visibility_jack_loopback = 'default'
+  # jack/jack_net
+  src_jack_net_windows = [
+    'windows/JackNetWinSocket.cpp',
+    'windows/JackWinThread.cpp',
+    'windows/JackMMCSS.cpp',
+    'windows/JackWinTime.c',
+  ]
+  src_jack_net += src_jack_net_posix + src_jack_net_windows
+  include_jack_net = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_net = []
+  symbol_visibility_jack_net = 'default'
+  # jack/jack_netone
+  src_jack_netone_windows = [
+    'windows/JackNetWinSocket.cpp',
+    'windows/JackWinThread.cpp',
+    'windows/JackMMCSS.cpp',
+    'windows/JackWinTime.c',
+  ]
+  src_jack_netone += src_jack_netone_posix + src_jack_netone_windows
+  include_jack_netone = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_netone = []
+  symbol_visibility_jack_netone = 'default'
+  # jack/jack_proxy
+  src_jack_netone_windows = [
+    'windows/JackNetWinSocket.cpp',
+    'windows/JackWinThread.cpp',
+    'windows/JackMMCSS.cpp',
+    'windows/JackWinTime.c',
+  ]
+  src_jack_proxy += src_jack_proxy_posix + src_jack_proxy_windows
+  include_jack_proxy = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_proxy = []
+  symbol_visibility_jack_proxy = 'default'
 endif
 
 # libraries
@@ -606,11 +831,11 @@ lib_jacknet = library(
   'jacknet',
   cpp_args: ['-DSERVER_SIDE'],
   version: jack_api_version,
-  sources: src_jack_net,
-  include_directories: include_jack_net,
-  dependencies: deps_jack_net,
-  link_args: link_flags_jack_net,
-  gnu_symbol_visibility: symbol_visibility_jack_net,
+  sources: src_jacknet,
+  include_directories: include_jacknet,
+  dependencies: deps_jacknet,
+  link_args: link_flags_jacknet,
+  gnu_symbol_visibility: symbol_visibility_jacknet,
   install: true
 )
 lib_netmanager = library(
@@ -662,6 +887,73 @@ lib_audioadapter = library(
   link_with: [lib_jackserver],
   link_args: link_flags_audioadapter,
   gnu_symbol_visibility: symbol_visibility_audioadapter,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
+
+# drivers
+lib_jack_dummy = library(
+  'jack_dummy',
+  name_prefix: '',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_jack_dummy,
+  include_directories: include_jack_dummy,
+  dependencies: deps_jack_dummy,
+  link_with: [lib_jackserver],
+  link_args: link_flags_jack_dummy,
+  gnu_symbol_visibility: symbol_visibility_jack_dummy,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
+lib_jack_loopback = library(
+  'jack_loopback',
+  name_prefix: '',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_jack_loopback,
+  include_directories: include_jack_loopback,
+  dependencies: deps_jack_loopback,
+  link_with: [lib_jackserver],
+  link_args: link_flags_jack_loopback,
+  gnu_symbol_visibility: symbol_visibility_jack_loopback,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
+lib_jack_net = library(
+  'jack_net',
+  name_prefix: '',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_jack_net,
+  include_directories: include_jack_net,
+  dependencies: deps_jack_net,
+  link_with: [lib_jackserver],
+  link_args: link_flags_jack_net,
+  gnu_symbol_visibility: symbol_visibility_jack_net,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
+lib_jack_netone = library(
+  'jack_netone',
+  name_prefix: '',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_jack_netone,
+  include_directories: include_jack_netone,
+  dependencies: deps_jack_netone,
+  link_with: [lib_jackserver],
+  link_args: link_flags_jack_netone,
+  gnu_symbol_visibility: symbol_visibility_jack_netone,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
+lib_jack_proxy = library(
+  'jack_proxy',
+  name_prefix: '',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_jack_proxy,
+  include_directories: include_jack_proxy,
+  dependencies: deps_jack_proxy,
+  link_with: [lib_jackserver],
+  link_args: link_flags_jack_proxy,
+  gnu_symbol_visibility: symbol_visibility_jack_proxy,
   install: true,
   install_dir: join_paths(get_option('libdir'), 'jack')
 )
