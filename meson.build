@@ -14,7 +14,7 @@ jack_api_version = '0.1.0'
 os = build_machine.system()
 conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
-conf_data.set('addon_dir', get_option('prefix') + get_option('libdir') + '/jack')
+conf_data.set('addon_dir', join_paths(get_option('prefix'), get_option('libdir'), '/jack'))
 config_header = configure_file(
   input: 'common/config.h.in',
   output: 'config.h',
@@ -37,6 +37,7 @@ if os == 'windows'
   dep_regex = dependency('REGEX')
   dep_ws2_32 = dependency('WS2_32')
   dep_psapi = dependency('PSAPI')
+  dep_portaudio = dependency('portaudio')
   dep_winmm = dependency('WINMM')
 endif
 
@@ -156,14 +157,67 @@ src_jack_net_posix = [
   'posix/JackPosixThread.cpp',
   'posix/JackPosixMutex.cpp']
 
+# sources for jack/netmanager
+src_netmanager = [
+  'common/JackNetManager.cpp',
+  'common/JackDebugClient.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackInternalClient.cpp',
+  'common/JackMessageBuffer.cpp',
+  'common/JackTools.cpp',
+  'common/JackServerAPI.cpp'
+  ]
+src_netmanager_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp'
+  ]
+
+# sources for jack/profiler
+src_profiler = [
+  'common/JackProfiler.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+  ]
+src_profiler_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+  ]
+
+# sources for jack/netadapter
+src_netadapter = [
+  'common/JackNetAdapter.cpp',
+  'common/JackAudioAdapter.cpp',
+  'common/JackAudioAdapterInterface.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackLibSampleRateResampler.cpp',
+  'common/JackMessageBuffer.cpp',
+  'common/JackResampler.cpp',
+]
+src_netadapter_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
 
 # dependencies for libjackserver
 deps_jack_server = [dep_threads, dep_celt, dep_opus, lib_db]
 
-# dependencies for libjackserver
+# dependencies for libjacknet
 deps_jack_net = [dep_threads, dep_celt, dep_opus, dep_samplerate]
+
+# dependencies for jack/netmanager
+deps_netmanager = [dep_threads]
+
+# dependencies for jack/profiler
+deps_profiler = [dep_threads]
+
+# dependencies for jack/netadapter
+deps_netadapter = [dep_threads, dep_samplerate]
 
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
@@ -196,6 +250,25 @@ if os == 'linux'
   deps_jack_net += [lib_rt]
   link_flags_jack_net = []
   symbol_visibility_jack_net = 'hidden'
+  # jack/netmanager
+  src_netmanager_linux = ['linux/JackLinuxTime.c']
+  src_netmanager += src_netmanager_posix + src_netmanager_linux
+  include_netmanager = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
+  deps_netmanager += [lib_dl, lib_rt]
+  link_flags_netmanager = []
+  symbol_visibility_netmanager = 'hidden'
+  # jack/profiler
+  src_profiler_linux = ['linux/JackLinuxTime.c']
+  src_profiler += src_profiler_posix + src_profiler_linux
+  include_profiler = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
+  link_flags_profiler = []
+  symbol_visibility_profiler = 'hidden'
+  # jack/netadapter
+  src_netadapter_linux = ['linux/JackLinuxTime.c']
+  src_netadapter += src_netadapter_posix + src_netadapter_linux
+  include_netadapter = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
+  link_flags_netadapter = []
+  symbol_visibility_netadapter = 'hidden'
 endif
 
 if os == 'sunos'
@@ -228,6 +301,25 @@ if os == 'sunos'
   deps_jack_net += [lib_rt]
   link_flags_jack_net = []
   symbol_visibility_jack_net = 'hidden'
+  # netmanager
+  src_netmanager_sunos = ['solaris/JackSolarisTime.c']
+  src_netmanager += src_netmanager_posix + src_netmanager_sunos
+  include_netmanager = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  deps_netmanager = [dep_threads, lib_dl, lib_rt]
+  link_flags_netmanager = []
+  symbol_visibility_netmanager = 'hidden'
+  # jack/profiler
+  src_profiler_sunos = ['solaris/JackSolarisTime.c']
+  src_profiler += src_profiler_posix + src_profiler_sunos
+  include_profiler = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  link_flags_profiler = []
+  symbol_visibility_profiler = 'hidden'
+  # jack/netadapter
+  src_netadapter_sunos = ['solaris/JackSolarisTime.c']
+  src_netadapter += src_netadapter_posix + src_netadapter_sunos
+  include_netadapter = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  link_flags_netadapter = []
+  symbol_visibility_netadapter = 'hidden'
 endif
 
 if os == 'darwin'
@@ -262,6 +354,26 @@ if os == 'darwin'
   deps_jack_net += [dep_coraudio]
   link_flags_jack_net = ['-single_module']
   symbol_visibility_jack_net = 'hidden'
+  # jack/netmanager
+  src_netmanager_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_netmanager += src_netmanager_posix + src_netmanager_darwin
+  include_netmanager = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
+  deps_netmanager += [dep_coraudio]
+  link_flags_netmanager = []
+  symbol_visibility_netmanager = 'hidden'
+  # jack/profiler
+  src_profiler_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_profiler += src_profiler_posix + src_profiler_darwin
+  include_profiler = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
+  deps_profiler += [dep_coraudio]
+  link_flags_profiler = []
+  symbol_visibility_profiler = 'hidden'
+  # jack/netadapter
+  src_netadapter_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_netadapter += src_netadapter_posix + src_netadapter_darwin
+  include_netadapter = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
+  link_flags_netadapter = []
+  symbol_visibility_netadapter = 'hidden'
 endif
 
 if os == 'windows'
@@ -294,27 +406,89 @@ if os == 'windows'
   deps_jack_net += [dep_winmm, dep_ws2_32]
   link_flags_jack_net = []
   symbol_visibility_jack_net = 'default'
+  # jack/netmanager
+  src_netmanager_windows = [
+    'windows/JackNetWinSocket.cpp',
+    'windows/JackWinThread.cpp',
+    'windows/JackMMCSS.cpp',
+    'windows/JackWinTime.c']
+  src_netmanager += src_netmanager_windows
+  include_netmanager = include_directories('.', 'common/jack', 'common', 'windows', 'windows/portaudio')
+  deps_netmanager += [dep_portaudio]
+  link_flags_netmanager = []
+  symbol_visibility_netmanager = 'default'
+  # jack/profiler
+  src_profiler_windows = [
+    'windows/JackNetWinSocket.cpp',
+    'windows/JackWinThread.cpp',
+    'windows/JackMMCSS.cpp',
+    'windows/JackWinTime.c']
+  src_profiler += src_profiler_windows
+  include_profiler = include_directories('.', 'common/jack', 'common', 'windows', 'windows/portaudio')
+  deps_profiler += [dep_portaudio]
+  link_flags_profiler = []
+  symbol_visibility_profiler = 'default'
+  # jack/netadapter
+  src_netadapter_windows = [
+    'windows/JackNetWinSocket.cpp',
+    'windows/JackWinThread.cpp',
+    'windows/JackMMCSS.cpp',
+    'windows/JackWinTime.c']
+  src_netadapter += src_netadapter_windows
+  include_netadapter = include_directories('.', 'common/jack', 'common', 'windows', 'windows/portaudio')
+  deps_profiler += [dep_portaudio]
+  link_flags_netadapter = []
+  symbol_visibility_netadapter = 'hidden'
 endif
 
 # libraries
-library('jack',
+lib_jack = library('jack',
         version: jack_api_version,
         sources: src_jack_client,
         include_directories: include_jack_client,
         dependencies: deps_jack_client,
         link_args: link_flags_jack_client,
         gnu_symbol_visibility: symbol_visibility_jack_client)
-library('jackserver',
+lib_jackserver = library('jackserver',
+        cpp_args: ['-DSERVER_SIDE'],
         version: jack_api_version,
         sources: src_jack_server,
         include_directories: include_jack_server,
         dependencies: deps_jack_server,
         link_args: link_flags_jack_server,
         gnu_symbol_visibility: symbol_visibility_jack_server)
-library('jacknet',
+lib_jacknet = library('jacknet',
+        cpp_args: ['-DSERVER_SIDE'],
         version: jack_api_version,
         sources: src_jack_net,
         include_directories: include_jack_net,
         dependencies: deps_jack_net,
         link_args: link_flags_jack_net,
         gnu_symbol_visibility: symbol_visibility_jack_net)
+lib_netmanager = library('netmanager',
+        name_prefix: '',
+        cpp_args: ['-DSERVER_SIDE'],
+        sources: src_netmanager,
+        include_directories: include_netmanager,
+        dependencies: deps_netmanager,
+        link_with: [lib_jackserver],
+        link_args: link_flags_netmanager,
+        gnu_symbol_visibility: symbol_visibility_netmanager)
+lib_profiler = library('profiler',
+        name_prefix: '',
+        cpp_args: ['-DSERVER_SIDE'],
+        sources: src_profiler,
+        include_directories: include_profiler,
+        dependencies: deps_profiler,
+        link_with: [lib_jackserver],
+        link_args: link_flags_profiler,
+        gnu_symbol_visibility: symbol_visibility_profiler)
+lib_netadapter = library('netadapter',
+        name_prefix: '',
+        cpp_args: ['-DSERVER_SIDE'],
+        sources: src_netadapter,
+        include_directories: include_netadapter,
+        dependencies: deps_netadapter,
+        link_with: [lib_jackserver],
+        link_args: link_flags_netadapter,
+        gnu_symbol_visibility: symbol_visibility_netadapter)
