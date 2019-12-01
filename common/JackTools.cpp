@@ -18,6 +18,7 @@
 */
 
 #include "JackConstants.h"
+#include "config.h"
 #include "driver_interface.h"
 #include "JackTools.h"
 #include "JackError.h"
