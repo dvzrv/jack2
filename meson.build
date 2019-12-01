@@ -2,7 +2,6 @@ project(
   'jack2',
   ['c', 'cpp'],
   default_options: [
-    'prefix=/usr/local',
     'b_pie=true',
     'b_lto=true'
   ],
@@ -224,6 +223,18 @@ src_audioadapter_posix = [
   'posix/JackPosixThread.cpp',
 ]
 
+# sources for jackd
+src_jackd = [
+  'common/Jackdmp.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jackd_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
 
@@ -245,6 +256,9 @@ deps_netadapter = [dep_threads, dep_samplerate]
 # dependencies for jack/audioadapter
 deps_audioadapter = [dep_threads, dep_samplerate]
 
+# dependencies for jackd
+deps_jackd = [dep_threads]
+
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
   src_common_linux = [
@@ -258,8 +272,21 @@ if os == 'linux'
     'linux/JackLinuxFutex.cpp',
     'linux/JackLinuxTime.c']
   # libjack
+  cpp_args_jack_client = []
   src_jack_client += src_common + src_common_linux + src_jack_client_posix
   include_jack_client = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
+  if dep_dbus.found() and get_option('autostart-method') == 'dbus'
+    message('Automatic starting through clients is done with D-Bus activation.')
+    cpp_args_jack_client += ['-DUSE_LIBDBUS_AUTOLAUNCH=1']
+    deps_jack_client += [dep_dbus]
+  endif
+  if get_option('autostart-method') == 'classic'
+    message('Automatic starting through clients is done with daemon activation.')
+    cpp_args_jack_client += [
+      '-DUSE_CLASSIC_AUTOLAUNCH=1',
+      '-DJACK_LOCATION="' + join_paths(get_option('prefix'), get_option('bindir')) + '"'
+    ]
+  endif
   deps_jack_client += [lib_rt, lib_dl]
   link_flags_jack_client = []
   symbol_visibility_jack_client = 'hidden'
@@ -307,6 +334,25 @@ if os == 'linux'
     link_flags_audioadapter = []
     symbol_visibility_audioadapter = 'hidden'
   endif
+  # jackd
+  src_jackd_linux = ['linux/JackLinuxTime.c']
+  src_jackd += src_jackd_posix + src_jackd_linux
+  include_jackd = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jackd += [lib_dl, lib_m, lib_rt, lib_stdcpp]
+  if dep_systemd.found()
+    message('Compiling jackd with systemd support.')
+    deps_jackd += [dep_systemd]
+  endif
+  if dep_dbus.found()
+    message('Compiling jackd with D-Bus support.')
+    src_jackd_linux_dbus = [
+      'dbus/audio_reserve.c',
+      'dbus/reserve.c',
+    ]
+    src_jackd += src_jackd_linux_dbus
+    deps_jackd += [dep_dbus]
+  endif
+  link_flags_jackd = []
 endif
 
 if os == 'sunos'
@@ -319,7 +365,8 @@ if os == 'sunos'
     'posix/JackPosixProcessSync.cpp',
     'posix/JackPosixMutex.cpp',
     'posix/JackSocket.cpp',
-    'solaris/JackSolarisTime.c']
+    'solaris/JackSolarisTime.c',
+  ]
   # libjack
   src_jack_client += src_common + src_common_sunos + src_jack_client_posix
   include_jack_client = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
@@ -370,6 +417,12 @@ if os == 'sunos'
     link_flags_audioadapter = []
     symbol_visibility_audioadapter = 'hidden'
   endif
+  # jackd
+  src_jackd_sunos = ['solaris/JackSolarisTime.c']
+  src_jackd += src_jackd_posix + src_jackd_sunos
+  include_jackd = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
+  deps_jackd += [lib_dl]
+  link_flags_jackd = []
 endif
 
 if os == 'darwin'
@@ -384,7 +437,8 @@ if os == 'darwin'
     # 'macosx/JackMachSemaphore.mm',
     'posix/JackPosixSemaphore.cpp',
     'posix/JackSocket.cpp',
-    'macosx/JackMachTime.c']
+    'macosx/JackMachTime.c',
+  ]
   # libjack
   src_jack_client += src_common + src_common_darwin + src_jack_client_posix
   include_jack_client = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'macosx/RPC', 'posix')
@@ -431,6 +485,12 @@ if os == 'darwin'
   deps_audioadapter += [dep_coreaudio, dep_audiounit, dep_audiotoolbox, dep_coreservices]
   link_flags_audioadapter = []
   symbol_visibility_audioadapter = 'hidden'
+  # jackd
+  src_jackd_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_jackd += src_jackd_posix + src_jackd_darwin
+  include_jackd = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jackd += [lib_dl]
+  link_flags_jackd = []
 endif
 
 if os == 'windows'
@@ -499,75 +559,111 @@ if os == 'windows'
   # jack/audioadapter
   src_audioadapter_windows = [
     'windows/portaudio/JackPortAudioAdapter.cpp',
-    'windows/portaudio/JackPortAudioDevices.cpp'
-    ]
+    'windows/portaudio/JackPortAudioDevices.cpp',
+  ]
   src_audioadapter += src_audioadapter_posix + src_audioadapter_windows
   include_audioadapter = include_directories('.', 'common/jack', 'common', 'windows', 'windows/portaudio')
   deps_audioadapter += [dep_portaudio]
   link_flags_audioadapter = []
   symbol_visibility_audioadapter = 'default'
+  # jackd
+  src_jackd_windows = [
+    'windows/JackNetWinSocket.cpp',
+    'windows/JackWinThread.cpp',
+    'windows/JackMMCSS.cpp',
+    'windows/JackWinTime.c',
+  ]
+  src_jackd += src_jackd_windows
+  include_jackd = include_directories('.', 'common/jack', 'common', 'windows',)
+  link_flags_jackd = []
 endif
 
 # libraries
-lib_jack = library('jack',
-        version: jack_api_version,
-        sources: src_jack_client,
-        include_directories: include_jack_client,
-        dependencies: deps_jack_client,
-        link_args: link_flags_jack_client,
-        gnu_symbol_visibility: symbol_visibility_jack_client)
-lib_jackserver = library('jackserver',
-        cpp_args: ['-DSERVER_SIDE'],
-        version: jack_api_version,
-        sources: src_jack_server,
-        include_directories: include_jack_server,
-        dependencies: deps_jack_server,
-        link_args: link_flags_jack_server,
-        gnu_symbol_visibility: symbol_visibility_jack_server)
-lib_jacknet = library('jacknet',
-        cpp_args: ['-DSERVER_SIDE'],
-        version: jack_api_version,
-        sources: src_jack_net,
-        include_directories: include_jack_net,
-        dependencies: deps_jack_net,
-        link_args: link_flags_jack_net,
-        gnu_symbol_visibility: symbol_visibility_jack_net)
-lib_netmanager = library('netmanager',
-        name_prefix: '',
-        cpp_args: ['-DSERVER_SIDE'],
-        sources: src_netmanager,
-        include_directories: include_netmanager,
-        dependencies: deps_netmanager,
-        link_with: [lib_jackserver],
-        link_args: link_flags_netmanager,
-        gnu_symbol_visibility: symbol_visibility_netmanager)
-lib_profiler = library('profiler',
-        name_prefix: '',
-        cpp_args: ['-DSERVER_SIDE'],
-        sources: src_profiler,
-        include_directories: include_profiler,
-        dependencies: deps_profiler,
-        link_with: [lib_jackserver],
-        link_args: link_flags_profiler,
-        gnu_symbol_visibility: symbol_visibility_profiler)
-lib_netadapter = library('netadapter',
-        name_prefix: '',
-        cpp_args: ['-DSERVER_SIDE'],
-        sources: src_netadapter,
-        include_directories: include_netadapter,
-        dependencies: deps_netadapter,
-        link_with: [lib_jackserver],
-        link_args: link_flags_netadapter,
-        gnu_symbol_visibility: symbol_visibility_netadapter)
-lib_audioadapter = library('audioadapter',
-        name_prefix: '',
-        cpp_args: ['-DSERVER_SIDE'],
-        sources: src_audioadapter,
-        include_directories: include_audioadapter,
-        dependencies: deps_audioadapter,
-        link_with: [lib_jackserver],
-        link_args: link_flags_audioadapter,
-        gnu_symbol_visibility: symbol_visibility_audioadapter)
+lib_jack = library(
+  'jack',
+  cpp_args: cpp_args_jack_client,
+  version: jack_api_version,
+  sources: src_jack_client,
+  include_directories: include_jack_client,
+  dependencies: deps_jack_client,
+  link_args: link_flags_jack_client,
+  gnu_symbol_visibility: symbol_visibility_jack_client,
+  install: true
+)
+lib_jackserver = library(
+  'jackserver',
+  cpp_args: ['-DSERVER_SIDE'],
+  version: jack_api_version,
+  sources: src_jack_server,
+  include_directories: include_jack_server,
+  dependencies: deps_jack_server,
+  link_args: link_flags_jack_server,
+  gnu_symbol_visibility: symbol_visibility_jack_server,
+  install: true
+)
+lib_jacknet = library(
+  'jacknet',
+  cpp_args: ['-DSERVER_SIDE'],
+  version: jack_api_version,
+  sources: src_jack_net,
+  include_directories: include_jack_net,
+  dependencies: deps_jack_net,
+  link_args: link_flags_jack_net,
+  gnu_symbol_visibility: symbol_visibility_jack_net,
+  install: true
+)
+lib_netmanager = library(
+  'netmanager',
+  name_prefix: '',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_netmanager,
+  include_directories: include_netmanager,
+  dependencies: deps_netmanager,
+  link_with: [lib_jackserver],
+  link_args: link_flags_netmanager,
+  gnu_symbol_visibility: symbol_visibility_netmanager,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
+lib_profiler = library(
+  'profiler',
+  name_prefix: '',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_profiler,
+  include_directories: include_profiler,
+  dependencies: deps_profiler,
+  link_with: [lib_jackserver],
+  link_args: link_flags_profiler,
+  gnu_symbol_visibility: symbol_visibility_profiler,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
+lib_netadapter = library(
+  'netadapter',
+  name_prefix: '',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_netadapter,
+  include_directories: include_netadapter,
+  dependencies: deps_netadapter,
+  link_with: [lib_jackserver],
+  link_args: link_flags_netadapter,
+  gnu_symbol_visibility: symbol_visibility_netadapter,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
+lib_audioadapter = library(
+  'audioadapter',
+  name_prefix: '',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_audioadapter,
+  include_directories: include_audioadapter,
+  dependencies: deps_audioadapter,
+  link_with: [lib_jackserver],
+  link_args: link_flags_audioadapter,
+  gnu_symbol_visibility: symbol_visibility_audioadapter,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
 
 # headers
 install_headers(
@@ -599,3 +695,14 @@ pkg.generate(lib_jack,
   variables: ['server_libs=-L${prefix}/${libdir} -ljackserver']
 )
 
+# executables
+exe_jackd = executable(
+  'jackd',
+  cpp_args: ['-DSERVER_SIDE'],
+  sources: src_jackd,
+  include_directories: include_jackd,
+  dependencies: deps_jackd,
+  link_with: [lib_jackserver],
+  link_args: link_flags_jackd,
+  install: true
+)
