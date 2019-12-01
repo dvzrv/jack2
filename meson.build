@@ -27,10 +27,17 @@ lib_db = meson.get_compiler('c').find_library('db')
 lib_c = meson.get_compiler('c').find_library('libc')
 lib_stdcpp = meson.get_compiler('cpp').find_library('stdc++')
 
+if os == 'sunos'
+  dep_oss = dependency('oss')
+endif
+
 if os == 'darwin'
   dep_accelerate = dependency('Accelerate')
+  dep_audiounit = dependency('AudioUnit')
+  dep_audiotoolbox = dependency('AudioToolbox')
   dep_coreaudio = dependency('CoreAudio')
   dep_corefoundation = dependency('CoreFoundation')
+  dep_coreservices = dependency('CoreServices')
 endif
 
 if os == 'windows'
@@ -201,6 +208,22 @@ src_netadapter_posix = [
   'posix/JackPosixThread.cpp',
 ]
 
+# sources for jack/audioadapter
+src_audioadapter = [
+  'common/JackAudioAdapter.cpp',
+  'common/JackAudioAdapterInterface.cpp',
+  'common/JackAudioAdapterFactory.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackLibSampleRateResampler.cpp',
+  'common/JackMessageBuffer.cpp',
+  'common/JackResampler.cpp',
+]
+src_audioadapter_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
 
@@ -218,6 +241,9 @@ deps_profiler = [dep_threads]
 
 # dependencies for jack/netadapter
 deps_netadapter = [dep_threads, dep_samplerate]
+
+# dependencies for jack/audioadapter
+deps_audioadapter = [dep_threads, dep_samplerate]
 
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
@@ -269,6 +295,18 @@ if os == 'linux'
   include_netadapter = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
   link_flags_netadapter = []
   symbol_visibility_netadapter = 'hidden'
+  # jack/audioadapter
+  if dep_alsa.found()
+    src_audioadapter_linux = [
+      'linux/alsa/JackAlsaAdapter.cpp',
+      'linux/JackLinuxTime.c',
+    ]
+    src_audioadapter += src_audioadapter_posix + src_audioadapter_linux
+    include_audioadapter = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
+    deps_audioadapter += [dep_alsa]
+    link_flags_audioadapter = []
+    symbol_visibility_audioadapter = 'hidden'
+  endif
 endif
 
 if os == 'sunos'
@@ -320,6 +358,18 @@ if os == 'sunos'
   include_netadapter = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
   link_flags_netadapter = []
   symbol_visibility_netadapter = 'hidden'
+  # jack/audioadapter
+  if dep_oss.found()
+    src_audioadapter_sunos = [
+      'common/memops.c',
+      'solaris/oss/JackOSSAdapter.cpp',
+    ]
+    src_audioadapter += src_audioadapter_posix + src_audioadapter_sunos
+    include_audioadapter = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+    deps_audioadapter += [dep_oss]
+    link_flags_audioadapter = []
+    symbol_visibility_audioadapter = 'hidden'
+  endif
 endif
 
 if os == 'darwin'
@@ -338,34 +388,34 @@ if os == 'darwin'
   # libjack
   src_jack_client += src_common + src_common_darwin + src_jack_client_posix
   include_jack_client = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'macosx/RPC', 'posix')
-  deps_jack_client += [dep_accelerate, dep_coraudio]
+  deps_jack_client += [dep_accelerate, dep_coreaudio]
   link_flags_jack_client = ['-single_module']
   symbol_visibility_jack_client = 'hidden'
   # libjackserver
   src_jack_server += src_common + src_common_darwin + src_jack_server_posix
   include_jack_server = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'macosx/RPC', 'posix')
-  deps_jack_server += [dep_accelerate, dep_coraudio, dep_corefoundation]
+  deps_jack_server += [dep_accelerate, dep_coreaudio, dep_corefoundation]
   link_flags_jack_server = ['-single_module']
   symbol_visibility_jack_server = 'hidden'
   # libjacknet
   src_jack_net_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jack_net += src_jack_net_posix + src_jack_net_darwin
   include_jack_server = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'macosx/RPC', 'posix')
-  deps_jack_net += [dep_coraudio]
+  deps_jack_net += [dep_coreaudio]
   link_flags_jack_net = ['-single_module']
   symbol_visibility_jack_net = 'hidden'
   # jack/netmanager
   src_netmanager_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_netmanager += src_netmanager_posix + src_netmanager_darwin
   include_netmanager = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
-  deps_netmanager += [dep_coraudio]
+  deps_netmanager += [dep_coreaudio]
   link_flags_netmanager = []
   symbol_visibility_netmanager = 'hidden'
   # jack/profiler
   src_profiler_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_profiler += src_profiler_posix + src_profiler_darwin
   include_profiler = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
-  deps_profiler += [dep_coraudio]
+  deps_profiler += [dep_coreaudio]
   link_flags_profiler = []
   symbol_visibility_profiler = 'hidden'
   # jack/netadapter
@@ -374,6 +424,13 @@ if os == 'darwin'
   include_netadapter = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
   link_flags_netadapter = []
   symbol_visibility_netadapter = 'hidden'
+  # jack/audioadapter
+  src_audioadapter_darwin = ['macosx/coreaudio/JackCoreAudioAdapter.mm']
+  src_audioadapter += src_audioadapter_posix + src_audioadapter_darwin
+  include_audioadapter = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
+  deps_audioadapter += [dep_coreaudio, dep_audiounit, dep_audiotoolbox, dep_coreservices]
+  link_flags_audioadapter = []
+  symbol_visibility_audioadapter = 'hidden'
 endif
 
 if os == 'windows'
@@ -438,7 +495,17 @@ if os == 'windows'
   include_netadapter = include_directories('.', 'common/jack', 'common', 'windows', 'windows/portaudio')
   deps_profiler += [dep_portaudio]
   link_flags_netadapter = []
-  symbol_visibility_netadapter = 'hidden'
+  symbol_visibility_netadapter = 'default'
+  # jack/audioadapter
+  src_audioadapter_windows = [
+    'windows/portaudio/JackPortAudioAdapter.cpp',
+    'windows/portaudio/JackPortAudioDevices.cpp'
+    ]
+  src_audioadapter += src_audioadapter_posix + src_audioadapter_windows
+  include_audioadapter = include_directories('.', 'common/jack', 'common', 'windows', 'windows/portaudio')
+  deps_audioadapter += [dep_portaudio]
+  link_flags_audioadapter = []
+  symbol_visibility_audioadapter = 'default'
 endif
 
 # libraries
@@ -492,3 +559,53 @@ lib_netadapter = library('netadapter',
         link_with: [lib_jackserver],
         link_args: link_flags_netadapter,
         gnu_symbol_visibility: symbol_visibility_netadapter)
+lib_audioadapter = library('audioadapter',
+        name_prefix: '',
+        cpp_args: ['-DSERVER_SIDE'],
+        sources: src_audioadapter,
+        include_directories: include_audioadapter,
+        dependencies: deps_audioadapter,
+        link_with: [lib_jackserver],
+        link_args: link_flags_audioadapter,
+        gnu_symbol_visibility: symbol_visibility_audioadapter)
+
+# headers
+headers_jack = [
+  'control.h',
+  'intclient.h',
+  'jack.h',
+  'jslist.h',
+  'metadata.h',
+  'midiport.h',
+  'net.h',
+  'ringbuffer.h',
+  'session.h',
+  'statistics.h',
+  'systemdeps.h',
+  'thread.h',
+  'transport.h',
+  'types.h',
+  'uuid.h',
+  'weakjack.h',
+  'weakmacros.h',
+]
+
+foreach header : headers_jack
+  configure_file(
+    input: join_paths('common/jack/', header),
+    output: header,
+    copy: true,
+    install: true,
+    install_dir: join_paths(get_option('prefix'), get_option('includedir'))
+  )
+endforeach
+
+# pkgconfig
+pkg = import('pkgconfig')
+pkg.generate(lib_jack,
+  filebase: 'jack',
+  description: 'The Jack Audio Connection Kit: A low-latency synchronous callback-based media server',
+  url: 'http://jackaudio.org',
+  variables: ['server_libs=-L${prefix}/${libdir} -ljackserver']
+)
+
