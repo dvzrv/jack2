@@ -1,0 +1,5 @@
+option('alsa', type: 'feature', value: 'auto', description: 'ALSA support')
+option('dbus', type: 'feature', value: 'auto', description: 'D-Bus support')
+option('ffado', type: 'feature', value: 'auto', description: 'FFADO support')
+option('systemd', type: 'feature', value: 'auto', description: 'Systemd integration')
+option('doxygen', type: 'feature', value: 'auto', description: 'Documentation')
