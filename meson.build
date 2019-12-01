@@ -13,6 +13,7 @@ jack_api_version = '0.1.0'
 os = build_machine.system()
 conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
+# TODO: turn into cpp_args
 conf_data.set('addon_dir', join_paths(get_option('prefix'), get_option('libdir'), '/jack'))
 config_header = configure_file(
   input: 'common/config.h.in',
@@ -31,12 +32,12 @@ if os == 'sunos'
 endif
 
 if os == 'darwin'
-  dep_accelerate = dependency('Accelerate')
-  dep_audiounit = dependency('AudioUnit')
-  dep_audiotoolbox = dependency('AudioToolbox')
-  dep_coreaudio = dependency('CoreAudio')
-  dep_corefoundation = dependency('CoreFoundation')
-  dep_coreservices = dependency('CoreServices')
+  dep_accelerate = dependency('Accelerate', method: 'extraframework')
+  dep_audiounit = dependency('AudioUnit', method: 'extraframework')
+  dep_audiotoolbox = dependency('AudioToolbox', method: 'extraframework')
+  dep_coreaudio = dependency('CoreAudio', method: 'extraframework')
+  dep_corefoundation = dependency('CoreFoundation', method: 'extraframework')
+  dep_coreservices = dependency('CoreServices', method: 'extraframework')
 endif
 
 if os == 'windows'
@@ -706,3 +707,24 @@ exe_jackd = executable(
   link_args: link_flags_jackd,
   install: true
 )
+
+# system integration
+if os == 'linux' and dep_systemd.found()
+  config_systemd = configuration_data(
+    {'PREFIX': get_option('prefix')}
+  )
+  configure_file(
+    input: 'systemd/jack@.service.in',
+    output: 'jack@.service',
+    install: true,
+    install_dir: dep_systemd.get_pkgconfig_variable('systemduserunitdir'),
+    configuration: config_systemd
+  )
+  configure_file(
+    input: 'systemd/example.conf',
+    output: 'example.conf',
+    copy: true,
+    install: true,
+    install_dir: join_paths(get_option('sysconfdir'), 'jack')
+  )
+endif
