@@ -298,6 +298,45 @@ src_jack_proxy_posix = [
   'posix/JackPosixThread.cpp',
 ]
 
+# sources for jack/jack_alsa
+src_jack_alsa = [
+  'common/memops.c',
+  'linux/alsa/JackAlsaDriver.cpp',
+  'linux/alsa/alsa_rawmidi.c',
+  'linux/alsa/alsa_seqmidi.c',
+  'linux/alsa/alsa_midi_jackmp.cpp',
+  'linux/alsa/generic_hw.c',
+  'linux/alsa/hdsp.c',
+  'linux/alsa/alsa_driver.c',
+  'linux/alsa/hammerfall.c',
+  'linux/alsa/ice1712.c',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jack_alsa_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
+# sources for jack/jack_alsarawmidi
+src_jack_alsarawmidi = [
+  'linux/alsarawmidi/JackALSARawMidiDriver.cpp',
+  'linux/alsarawmidi/JackALSARawMidiInputPort.cpp',
+  'linux/alsarawmidi/JackALSARawMidiOutputPort.cpp',
+  'linux/alsarawmidi/JackALSARawMidiPort.cpp',
+  'linux/alsarawmidi/JackALSARawMidiReceiveQueue.cpp',
+  'linux/alsarawmidi/JackALSARawMidiSendQueue.cpp',
+  'linux/alsarawmidi/JackALSARawMidiUtil.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jack_alsarawmidi_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
 
@@ -336,6 +375,12 @@ deps_jack_netone = [dep_celt, dep_samplerate, dep_threads]
 
 # dependencies for jack/jack_proxy
 deps_jack_proxy = [dep_threads]
+
+# dependencies for jack/jack_alsa
+deps_jack_alsa = [dep_alsa, dep_threads]
+
+# dependencies for jack/jack_alsa
+deps_jack_alsarawmidi = [dep_alsa, dep_threads]
 
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
@@ -462,6 +507,23 @@ if os == 'linux'
   deps_jack_proxy += [lib_dl]
   link_flags_jack_proxy = []
   symbol_visibility_jack_proxy = 'default'
+  if dep_alsa.found()
+    # jack/jack_alsa
+    src_jack_alsa_linux = ['linux/JackLinuxTime.c']
+    src_jack_alsa += src_jack_alsa_posix + src_jack_alsa_linux
+    cpp_args_jack_alsa = ['-DJACKMP=1', '-DSERVER_SIDE']
+    c_args_jack_alsa = ['-DJACKMP=1', '-DSERVER_SIDE']
+    include_jack_alsa = include_directories('.', 'common', 'common/jack', 'linux/alsa', 'linux', 'posix')
+    link_flags_jack_alsa = []
+    symbol_visibility_jack_alsa = 'default'
+    # jack/jack_alsarawmidi
+    src_jack_alsarawmidi_linux = ['linux/JackLinuxTime.c']
+    src_jack_alsarawmidi += src_jack_alsarawmidi_posix + src_jack_alsarawmidi_linux
+    cpp_args_jack_alsarawmidi = ['-DSERVER_SIDE']
+    include_jack_alsarawmidi = include_directories('.', 'common', 'common/jack', 'linux/alsa', 'linux', 'posix')
+    link_flags_jack_alsarawmidi = []
+    symbol_visibility_jack_alsarawmidi = 'default'
+  endif
 endif
 
 if os == 'sunos'
@@ -957,6 +1019,35 @@ lib_jack_proxy = library(
   install: true,
   install_dir: join_paths(get_option('libdir'), 'jack')
 )
+if os == 'linux' and dep_alsa.found()
+  lib_jack_alsa = library(
+    'jack_alsa',
+    name_prefix: '',
+    cpp_args: cpp_args_jack_alsa,
+    c_args: c_args_jack_alsa,
+    sources: src_jack_alsa,
+    include_directories: include_jack_alsa,
+    dependencies: deps_jack_alsa,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_alsa,
+    gnu_symbol_visibility: symbol_visibility_jack_alsa,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+  lib_jack_alsarawmidi = library(
+    'jack_alsarawmidi',
+    name_prefix: '',
+    cpp_args: cpp_args_jack_alsarawmidi,
+    sources: src_jack_alsarawmidi,
+    include_directories: include_jack_alsarawmidi,
+    dependencies: deps_jack_alsarawmidi,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_alsarawmidi,
+    gnu_symbol_visibility: symbol_visibility_jack_alsarawmidi,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+endif
 
 # headers
 install_headers(
