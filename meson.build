@@ -337,6 +337,22 @@ src_jack_alsarawmidi_posix = [
   'posix/JackPosixThread.cpp',
 ]
 
+# sources for jack/jack_firewire
+src_jack_firewire = [
+  'linux/firewire/JackFFADODriver.cpp',
+  'linux/firewire/JackFFADOMidiInputPort.cpp',
+  'linux/firewire/JackFFADOMidiOutputPort.cpp',
+  'linux/firewire/JackFFADOMidiReceiveQueue.cpp',
+  'linux/firewire/JackFFADOMidiSendQueue.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jack_firewire_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
 
@@ -381,6 +397,9 @@ deps_jack_alsa = [dep_alsa, dep_threads]
 
 # dependencies for jack/jack_alsa
 deps_jack_alsarawmidi = [dep_alsa, dep_threads]
+
+# dependencies for jack/jack_firewire
+deps_jack_firewire = [dep_threads, dep_ffado]
 
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
@@ -508,6 +527,7 @@ if os == 'linux'
   link_flags_jack_proxy = []
   symbol_visibility_jack_proxy = 'default'
   if dep_alsa.found()
+    message('Building ALSA drivers.')
     # jack/jack_alsa
     src_jack_alsa_linux = ['linux/JackLinuxTime.c']
     src_jack_alsa += src_jack_alsa_posix + src_jack_alsa_linux
@@ -523,6 +543,16 @@ if os == 'linux'
     include_jack_alsarawmidi = include_directories('.', 'common', 'common/jack', 'linux/alsa', 'linux', 'posix')
     link_flags_jack_alsarawmidi = []
     symbol_visibility_jack_alsarawmidi = 'default'
+  endif
+  if dep_ffado.found()
+    message('Building FFADO driver.')
+    # jack/jack_firewire
+    src_jack_firewire_linux = ['linux/JackLinuxTime.c']
+    src_jack_firewire += src_jack_firewire_posix + src_jack_firewire_linux
+    cpp_args_jack_firewire = ['-DSERVER_SIDE']
+    include_jack_firewire = include_directories('.', 'common', 'common/jack', 'linux/firewire', 'linux', 'posix')
+    link_flags_jack_firewire = []
+    symbol_visibility_jack_firewire = 'default'
   endif
 endif
 
@@ -1044,6 +1074,21 @@ if os == 'linux' and dep_alsa.found()
     link_with: [lib_jackserver],
     link_args: link_flags_jack_alsarawmidi,
     gnu_symbol_visibility: symbol_visibility_jack_alsarawmidi,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+endif
+if os == 'linux' and dep_ffado.found()
+  lib_jack_firewire = library(
+    'jack_firewire',
+    name_prefix: '',
+    cpp_args: cpp_args_jack_firewire,
+    sources: src_jack_firewire,
+    include_directories: include_jack_firewire,
+    dependencies: deps_jack_firewire,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_firewire,
+    gnu_symbol_visibility: symbol_visibility_jack_firewire,
     install: true,
     install_dir: join_paths(get_option('libdir'), 'jack')
   )
