@@ -18,7 +18,6 @@ conf_data.set('version', meson.project_version())
 lib_dl = meson.get_compiler('c').find_library('dl')
 lib_m = meson.get_compiler('c').find_library('m')
 lib_db = meson.get_compiler('c').find_library('db')
-lib_c = meson.get_compiler('c').find_library('libc')
 lib_stdcpp = meson.get_compiler('cpp').find_library('stdc++')
 
 if os in ['linux', 'sunos']
