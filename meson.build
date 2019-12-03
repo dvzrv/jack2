@@ -47,12 +47,15 @@ if os == 'windows'
   dep_winmm = dependency('WINMM')
 endif
 
-dep_alsa = dependency('alsa', version: '>=1.0.18', required: get_option('alsa'), disabler: true)
-dep_dbus = dependency('dbus-1', version: '>=1.0.0', required: get_option('dbus'), disabler: true)
-dep_ffado = dependency('libffado', version: '>=1.999.17', required: get_option('ffado'), disabler: true)
-dep_iio = dependency('libiio', version: '>=0.16', required: get_option('iio'), disabler: true)
-dep_gtkiostream = dependency('gtkIOStream', version: '>=1.7.0', required: get_option('iio'), disabler: true)
-dep_systemd = dependency('systemd', required: get_option('systemd'), disabler: true)
+if os == 'linux'
+  dep_alsa = dependency('alsa', version: '>=1.0.18', required: get_option('alsa'), disabler: true)
+  dep_dbus = dependency('dbus-1', version: '>=1.0.0', required: get_option('dbus'), disabler: true)
+  dep_ffado = dependency('libffado', version: '>=1.999.17', required: get_option('ffado'), disabler: true)
+  dep_iio = dependency('libiio', version: '>=0.16', required: get_option('iio'), disabler: true)
+  dep_gtkiostream = dependency('gtkIOStream', version: '>=1.7.0', required: get_option('iio'), disabler: true)
+  dep_systemd = dependency('systemd', required: get_option('systemd'), disabler: true)
+endif
+
 dep_celt = dependency('celt', version: '>=0.11.0')
 dep_opus = dependency('opus', version: '>=0.9.0')
 dep_readline = dependency('readline')
