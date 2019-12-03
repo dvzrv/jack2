@@ -37,6 +37,7 @@ if os == 'sunos'
 endif
 
 if os == 'darwin'
+  add_language('objc')
   dep_accelerate = dependency('Accelerate', method: 'extraframework', disabler: true)
   dep_audiounit = dependency('AudioUnit', method: 'extraframework', disabler: true)
   dep_audiotoolbox = dependency('AudioToolbox', method: 'extraframework', disabler: true)
