@@ -20,24 +20,29 @@ config_header = configure_file(
   output: 'config.h',
   configuration: conf_data)
 
+# c library dependencies
 lib_dl = meson.get_compiler('c').find_library('dl')
 lib_m = meson.get_compiler('c').find_library('m')
-lib_rt = meson.get_compiler('c').find_library('rt')
 lib_db = meson.get_compiler('c').find_library('db')
 lib_c = meson.get_compiler('c').find_library('libc')
 lib_stdcpp = meson.get_compiler('cpp').find_library('stdc++')
 
+if os in ['linux', 'sunos']
+  lib_rt = meson.get_compiler('c').find_library('rt')
+endif
+
+# package dependencies
 if os == 'sunos'
   dep_oss = dependency('oss')
 endif
 
 if os == 'darwin'
-  dep_accelerate = dependency('Accelerate', method: 'extraframework')
-  dep_audiounit = dependency('AudioUnit', method: 'extraframework')
-  dep_audiotoolbox = dependency('AudioToolbox', method: 'extraframework')
-  dep_coreaudio = dependency('CoreAudio', method: 'extraframework')
-  dep_corefoundation = dependency('CoreFoundation', method: 'extraframework')
-  dep_coreservices = dependency('CoreServices', method: 'extraframework')
+  dep_accelerate = dependency('Accelerate', method: 'extraframework', disabler: true)
+  dep_audiounit = dependency('AudioUnit', method: 'extraframework', disabler: true)
+  dep_audiotoolbox = dependency('AudioToolbox', method: 'extraframework', disabler: true)
+  dep_coreaudio = dependency('CoreAudio', method: 'extraframework', disabler: true)
+  dep_corefoundation = dependency('CoreFoundation', method: 'extraframework', disabler: true)
+  dep_coreservices = dependency('CoreServices', method: 'extraframework', disabler: true)
 endif
 
 if os == 'windows'
@@ -48,18 +53,20 @@ if os == 'windows'
   dep_winmm = dependency('WINMM')
 endif
 
-dep_alsa = dependency('alsa', version: '>=1.0.18', required: get_option('alsa'))
+dep_alsa = dependency('alsa', version: '>=1.0.18', required: get_option('alsa'), disabler: true)
+dep_dbus = dependency('dbus-1', version: '>=1.0.0', required: get_option('dbus'), disabler: true)
+dep_ffado = dependency('libffado', version: '>=1.999.17', required: get_option('ffado'), disabler: true)
+dep_iio = dependency('libiio', version: '>=0.16', required: get_option('iio'), disabler: true)
+dep_gtkiostream = dependency('gtkIOStream', version: '>=1.7.0', required: get_option('iio'), disabler: true)
+dep_systemd = dependency('systemd', required: get_option('systemd'), disabler: true)
 dep_celt = dependency('celt', version: '>=0.11.0')
-dep_dbus = dependency('dbus-1', version: '>=1.0.0', required: get_option('dbus'))
-dep_ffado = dependency('libffado', version: '>=1.999.17', required: get_option('ffado'))
 dep_opus = dependency('opus', version: '>=0.9.0')
 dep_readline = dependency('readline')
 dep_samplerate = dependency('samplerate')
 dep_sndfile = dependency('sndfile')
-dep_systemd = dependency('systemd', required: get_option('systemd'))
 dep_threads = dependency('threads')
 
-doxygen = find_program('doxygen', required : get_option('doxygen'))
+doxygen = find_program('doxygen', required : get_option('doxygen'), disabler: true)
 
 # sources for libjack
 src_common = [
@@ -353,6 +360,18 @@ src_jack_firewire_posix = [
   'posix/JackPosixThread.cpp',
 ]
 
+# sources for jack/jack_iio
+src_jack_iio = [
+  'linux/iio/JackIIODriver.cpp',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jack_iio_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
 
@@ -393,13 +412,16 @@ deps_jack_netone = [dep_celt, dep_samplerate, dep_threads]
 deps_jack_proxy = [dep_threads]
 
 # dependencies for jack/jack_alsa
-deps_jack_alsa = [dep_alsa, dep_threads]
+deps_jack_alsa = [dep_threads]
 
-# dependencies for jack/jack_alsa
-deps_jack_alsarawmidi = [dep_alsa, dep_threads]
+# dependencies for jack/jack_alsarawmidi
+deps_jack_alsarawmidi = [dep_threads]
 
 # dependencies for jack/jack_firewire
-deps_jack_firewire = [dep_threads, dep_ffado]
+deps_jack_firewire = [dep_threads]
+
+# dependencies for jack/jack_iio
+deps_jack_iio = [dep_threads]
 
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
@@ -534,6 +556,7 @@ if os == 'linux'
     cpp_args_jack_alsa = ['-DJACKMP=1', '-DSERVER_SIDE']
     c_args_jack_alsa = ['-DJACKMP=1', '-DSERVER_SIDE']
     include_jack_alsa = include_directories('.', 'common', 'common/jack', 'linux/alsa', 'linux', 'posix')
+    deps_jack_alsa += [dep_alsa]
     link_flags_jack_alsa = []
     symbol_visibility_jack_alsa = 'default'
     # jack/jack_alsarawmidi
@@ -541,6 +564,7 @@ if os == 'linux'
     src_jack_alsarawmidi += src_jack_alsarawmidi_posix + src_jack_alsarawmidi_linux
     cpp_args_jack_alsarawmidi = ['-DSERVER_SIDE']
     include_jack_alsarawmidi = include_directories('.', 'common', 'common/jack', 'linux/alsa', 'linux', 'posix')
+    deps_jack_alsarawmidi += [dep_alsa]
     link_flags_jack_alsarawmidi = []
     symbol_visibility_jack_alsarawmidi = 'default'
   endif
@@ -551,8 +575,20 @@ if os == 'linux'
     src_jack_firewire += src_jack_firewire_posix + src_jack_firewire_linux
     cpp_args_jack_firewire = ['-DSERVER_SIDE']
     include_jack_firewire = include_directories('.', 'common', 'common/jack', 'linux/firewire', 'linux', 'posix')
+    deps_jack_firewire += [dep_ffado]
     link_flags_jack_firewire = []
     symbol_visibility_jack_firewire = 'default'
+  endif
+  if dep_iio.found() and dep_gtkiostream.found()
+    message('Building IIO driver.')
+    # jack/jack_iio
+    src_jack_iio_linux = ['linux/JackLinuxTime.c']
+    src_jack_iio += src_jack_iio_posix + src_jack_iio_linux
+    cpp_args_jack_iio = ['-DSERVER_SIDE']
+    include_jack_iio = include_directories('.', 'common', 'common/jack', 'linux/iio', 'linux', 'posix')
+    deps_jack_iio += [dep_iio, dep_gtkiostream]
+    link_flags_jack_iio = []
+    symbol_visibility_jack_iio = 'default'
   endif
 endif
 
@@ -658,7 +694,7 @@ if os == 'sunos'
 endif
 
 if os == 'darwin'
-  src_common_darwin += [
+  src_common_darwin = [
     'common/JackDebugClient.cpp',
     'common/timestamps.c',
     'common/promiscuous.c',
@@ -673,20 +709,20 @@ if os == 'darwin'
   ]
   # libjack
   src_jack_client += src_common + src_common_darwin + src_jack_client_posix
-  include_jack_client = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'macosx/RPC', 'posix')
+  include_jack_client = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
   deps_jack_client += [dep_accelerate, dep_coreaudio]
   link_flags_jack_client = ['-single_module']
   symbol_visibility_jack_client = 'hidden'
   # libjackserver
   src_jack_server += src_common + src_common_darwin + src_jack_server_posix
-  include_jack_server = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'macosx/RPC', 'posix')
+  include_jack_server = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
   deps_jack_server += [dep_accelerate, dep_coreaudio, dep_corefoundation]
   link_flags_jack_server = ['-single_module']
   symbol_visibility_jack_server = 'hidden'
   # libjacknet
   src_jacknet_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jacknet += src_jacknet_posix + src_jacknet_darwin
-  include_jack_server = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'macosx/RPC', 'posix')
+  include_jack_server = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
   deps_jacknet += [dep_coreaudio]
   link_flags_jacknet = ['-single_module']
   symbol_visibility_jacknet = 'hidden'
@@ -1089,6 +1125,21 @@ if os == 'linux' and dep_ffado.found()
     link_with: [lib_jackserver],
     link_args: link_flags_jack_firewire,
     gnu_symbol_visibility: symbol_visibility_jack_firewire,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+endif
+if os == 'linux' and dep_iio.found() and dep_gtkiostream.found()
+  lib_jack_iio = library(
+    'jack_iio',
+    name_prefix: '',
+    cpp_args: cpp_args_jack_iio,
+    sources: src_jack_iio,
+    include_directories: include_jack_iio,
+    dependencies: deps_jack_iio,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_iio,
+    gnu_symbol_visibility: symbol_visibility_jack_iio,
     install: true,
     install_dir: join_paths(get_option('libdir'), 'jack')
   )
