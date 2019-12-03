@@ -367,6 +367,18 @@ src_jack_iio_posix = [
   'posix/JackPosixThread.cpp',
 ]
 
+# sources for jack/jack_boomer
+src_jack_boomer = [
+  'common/memops.c',
+  'solaris/oss/JackBoomerDriver.cpp',
+]
+
+# sources for jack/jack_oss
+src_jack_oss = [
+  'common/memops.c',
+  'solaris/oss/JackOSSDriver.cpp',
+]
+
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
 
@@ -703,6 +715,9 @@ if os == 'sunos'
   deps_jack_proxy += [lib_dl]
   link_flags_jack_proxy = []
   symbol_visibility_jack_proxy = 'default'
+  if dep_oss.found()
+    message('Building boomer and OSS drivers.')
+  endif
 endif
 
 if os == 'darwin'
