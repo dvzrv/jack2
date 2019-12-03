@@ -13,12 +13,6 @@ jack_api_version = '0.1.0'
 os = build_machine.system()
 conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
-# TODO: turn into cpp_args
-conf_data.set('addon_dir', join_paths(get_option('prefix'), get_option('libdir'), '/jack'))
-config_header = configure_file(
-  input: 'common/config.h.in',
-  output: 'config.h',
-  configuration: conf_data)
 
 # c library dependencies
 lib_dl = meson.get_compiler('c').find_library('dl')
@@ -437,7 +431,7 @@ if os == 'linux'
     'linux/JackLinuxFutex.cpp',
     'linux/JackLinuxTime.c']
   # libjack
-  cpp_args_jack_client = []
+  cpp_args_jack_client = ['-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"']
   src_jack_client += src_common + src_common_linux + src_jack_client_posix
   include_jack_client = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
   if dep_dbus.found() and get_option('autostart-method') == 'dbus'
@@ -457,6 +451,10 @@ if os == 'linux'
   symbol_visibility_jack_client = 'hidden'
   # libjackserver
   src_jack_server += src_common + src_common_linux + src_jack_server_posix
+  cpp_args_jack_server = [
+    '-DSERVER_SIDE',
+    '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"',
+  ]
   include_jack_server = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
   deps_jack_server += [lib_rt, lib_dl]
   link_flags_jack_server = []
@@ -471,6 +469,10 @@ if os == 'linux'
   # jack/netmanager
   src_netmanager_linux = ['linux/JackLinuxTime.c']
   src_netmanager += src_netmanager_posix + src_netmanager_linux
+  cpp_args_netmanager = [
+    '-DSERVER_SIDE',
+    '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"',
+  ]
   include_netmanager = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
   deps_netmanager += [lib_dl, lib_rt]
   link_flags_netmanager = []
@@ -607,12 +609,17 @@ if os == 'sunos'
   ]
   # libjack
   src_jack_client += src_common + src_common_sunos + src_jack_client_posix
+  cpp_args_jack_client = ['-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"']
   include_jack_client = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
   deps_jack_client += [lib_rt]
   link_flags_jack_client = ['-lnsl', '-lsocket']
   symbol_visibility_jack_client = 'default'
   # libjackserver
   src_jack_server += src_common + src_common_sunos + src_jack_server_posix
+  cpp_args_jack_server = [
+    '-DSERVER_SIDE',
+    '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"',
+  ]
   include_jack_server = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
   deps_jack_server += [lib_rt]
   link_flags_jack_server = ['-lnsl', '-lsocket']
@@ -627,6 +634,10 @@ if os == 'sunos'
   # netmanager
   src_netmanager_sunos = ['solaris/JackSolarisTime.c']
   src_netmanager += src_netmanager_posix + src_netmanager_sunos
+  cpp_args_netmanager = [
+    '-DSERVER_SIDE',
+    '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"',
+  ]
   include_netmanager = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
   deps_netmanager = [dep_threads, lib_dl, lib_rt]
   link_flags_netmanager = []
@@ -710,12 +721,17 @@ if os == 'darwin'
   ]
   # libjack
   src_jack_client += src_common + src_common_darwin + src_jack_client_posix
+  cpp_args_jack_client = ['-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"']
   include_jack_client = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
   deps_jack_client += [dep_accelerate, dep_coreaudio]
   link_flags_jack_client = ['-single_module']
   symbol_visibility_jack_client = 'hidden'
   # libjackserver
   src_jack_server += src_common + src_common_darwin + src_jack_server_posix
+  cpp_args_jack_server = [
+    '-DSERVER_SIDE',
+    '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"',
+  ]
   include_jack_server = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
   deps_jack_server += [dep_accelerate, dep_coreaudio, dep_corefoundation]
   link_flags_jack_server = ['-single_module']
@@ -730,6 +746,10 @@ if os == 'darwin'
   # jack/netmanager
   src_netmanager_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_netmanager += src_netmanager_posix + src_netmanager_darwin
+  cpp_args_netmanager = [
+    '-DSERVER_SIDE',
+    '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"',
+  ]
   include_netmanager = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
   deps_netmanager += [dep_coreaudio]
   link_flags_netmanager = []
@@ -802,12 +822,17 @@ if os == 'windows'
     'windows/JackWinTime.c']
   # libjack
   src_jack_client += src_common + src_common_windows + src_jack_client_windows
+  cpp_args_jack_client = ['-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('bindir'), '/jack') + '"']
   include_jack_client = include_directories('.', 'common/jack', 'common', 'windows')
   deps_jack_client += [dep_regex, dep_ws2_32, dep_psapi, dep_winmm]
   link_flags_jack_client = []
   symbol_visibility_jack_client = 'default'
   # libjackserver
   src_jack_server += src_common + src_common_windows + src_jack_server_windows
+  cpp_args_jack_server = [
+    '-DSERVER_SIDE',
+    '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('bindir'), '/jack') + '"',
+  ]
   include_jack_server = include_directories('.', 'common/jack', 'common', 'windows')
   deps_jack_server += [dep_regex, dep_ws2_32, dep_psapi, dep_winmm]
   link_flags_jack_server = []
@@ -830,6 +855,10 @@ if os == 'windows'
     'windows/JackMMCSS.cpp',
     'windows/JackWinTime.c']
   src_netmanager += src_netmanager_windows
+  cpp_args_netmanager = [
+    '-DSERVER_SIDE',
+    '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('bindir'), '/jack') + '"',
+  ]
   include_netmanager = include_directories('.', 'common/jack', 'common', 'windows', 'windows/portaudio')
   deps_netmanager += [dep_portaudio]
   link_flags_netmanager = []
@@ -947,7 +976,7 @@ lib_jack = library(
 )
 lib_jackserver = library(
   'jackserver',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_jack_server,
   version: jack_api_version,
   sources: src_jack_server,
   include_directories: include_jack_server,
@@ -970,7 +999,7 @@ lib_jacknet = library(
 lib_netmanager = library(
   'netmanager',
   name_prefix: '',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_netmanager,
   sources: src_netmanager,
   include_directories: include_netmanager,
   dependencies: deps_netmanager,

@@ -1,6 +1,0 @@
-#ifndef HAVE_CONFIG_H
-#define HAVE_CONFIG_H
-
-#define ADDON_DIR "@addon_dir@"
-
-#endif
