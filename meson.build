@@ -9,6 +9,8 @@ jack_api_version = '0.1.0'
 os = build_machine.system()
 conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
+conf_data.set('clients', get_option('clients'))
+conf_data.set('ports-per-client', get_option('ports-per-client'))
 
 # languages
 if os == 'darwin'
@@ -423,9 +425,13 @@ src_jack_winmme = [
   'windows/winmme/JackWinMMEPort.cpp',
 ]
 
-if dep_celt.found()
-  message('Building libjack, libjackserver, libjacknet and jack/jack_netone with legacy celt support.')
-endif
+# cpp_args
+cpp_args_common = [
+  '-DCLIENT_NUM=@0@'.format(conf_data.get('clients')),
+  '-DPORT_NUM_FOR_CLIENT=@0@'.format(conf_data.get('ports-per-client'))
+]
+message('Maximum number of JACK clients: @0@'.format(conf_data.get('clients')))
+message('Maximum number of ports per JACK client: @0@'.format(conf_data.get('ports-per-client')))
 
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
@@ -489,6 +495,10 @@ deps_jack_portaudio = []
 
 # dependencies for jack/jack_winmme
 deps_jack_winmme = []
+
+if dep_celt.found()
+  message('Compiling libjack, libjackserver, libjacknet and jack/jack_netone with legacy celt support.')
+endif
 
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
@@ -1121,7 +1131,7 @@ endif
 # libraries
 lib_jack = library(
   'jack',
-  cpp_args: cpp_args_jack_client,
+  cpp_args: cpp_args_common + cpp_args_jack_client,
   version: jack_api_version,
   sources: src_jack_client,
   include_directories: include_jack_client,
@@ -1132,7 +1142,7 @@ lib_jack = library(
 )
 lib_jackserver = library(
   'jackserver',
-  cpp_args: cpp_args_jack_server,
+  cpp_args: cpp_args_common + cpp_args_jack_server,
   version: jack_api_version,
   sources: src_jack_server,
   include_directories: include_jack_server,
@@ -1143,7 +1153,7 @@ lib_jackserver = library(
 )
 lib_jacknet = library(
   'jacknet',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   version: jack_api_version,
   sources: src_jacknet,
   include_directories: include_jacknet,
@@ -1155,7 +1165,7 @@ lib_jacknet = library(
 lib_netmanager = library(
   'netmanager',
   name_prefix: '',
-  cpp_args: cpp_args_netmanager,
+  cpp_args: cpp_args_common + cpp_args_netmanager,
   sources: src_netmanager,
   include_directories: include_netmanager,
   dependencies: deps_netmanager,
@@ -1168,7 +1178,7 @@ lib_netmanager = library(
 lib_profiler = library(
   'profiler',
   name_prefix: '',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   sources: src_profiler,
   include_directories: include_profiler,
   dependencies: deps_profiler,
@@ -1181,7 +1191,7 @@ lib_profiler = library(
 lib_netadapter = library(
   'netadapter',
   name_prefix: '',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   sources: src_netadapter,
   include_directories: include_netadapter,
   dependencies: deps_netadapter,
@@ -1194,7 +1204,7 @@ lib_netadapter = library(
 lib_audioadapter = library(
   'audioadapter',
   name_prefix: '',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   sources: src_audioadapter,
   include_directories: include_audioadapter,
   dependencies: deps_audioadapter,
@@ -1209,7 +1219,7 @@ lib_audioadapter = library(
 lib_jack_dummy = library(
   'jack_dummy',
   name_prefix: '',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   sources: src_jack_dummy,
   include_directories: include_jack_dummy,
   dependencies: deps_jack_dummy,
@@ -1222,7 +1232,7 @@ lib_jack_dummy = library(
 lib_jack_loopback = library(
   'jack_loopback',
   name_prefix: '',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   sources: src_jack_loopback,
   include_directories: include_jack_loopback,
   dependencies: deps_jack_loopback,
@@ -1235,7 +1245,7 @@ lib_jack_loopback = library(
 lib_jack_net = library(
   'jack_net',
   name_prefix: '',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   sources: src_jack_net,
   include_directories: include_jack_net,
   dependencies: deps_jack_net,
@@ -1248,7 +1258,7 @@ lib_jack_net = library(
 lib_jack_netone = library(
   'jack_netone',
   name_prefix: '',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   sources: src_jack_netone,
   include_directories: include_jack_netone,
   dependencies: deps_jack_netone,
@@ -1261,7 +1271,7 @@ lib_jack_netone = library(
 lib_jack_proxy = library(
   'jack_proxy',
   name_prefix: '',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   sources: src_jack_proxy,
   include_directories: include_jack_proxy,
   dependencies: deps_jack_proxy,
@@ -1275,7 +1285,7 @@ if os == 'linux' and dep_alsa.found()
   lib_jack_alsa = library(
     'jack_alsa',
     name_prefix: '',
-    cpp_args: cpp_args_jack_alsa,
+    cpp_args: cpp_args_common + cpp_args_jack_alsa,
     c_args: c_args_jack_alsa,
     sources: src_jack_alsa,
     include_directories: include_jack_alsa,
@@ -1289,7 +1299,7 @@ if os == 'linux' and dep_alsa.found()
   lib_jack_alsarawmidi = library(
     'jack_alsarawmidi',
     name_prefix: '',
-    cpp_args: cpp_args_jack_alsarawmidi,
+    cpp_args: cpp_args_common + cpp_args_jack_alsarawmidi,
     sources: src_jack_alsarawmidi,
     include_directories: include_jack_alsarawmidi,
     dependencies: deps_jack_alsarawmidi,
@@ -1304,7 +1314,7 @@ if os == 'linux' and dep_ffado.found()
   lib_jack_firewire = library(
     'jack_firewire',
     name_prefix: '',
-    cpp_args: cpp_args_jack_firewire,
+    cpp_args: cpp_args_common + cpp_args_jack_firewire,
     sources: src_jack_firewire,
     include_directories: include_jack_firewire,
     dependencies: deps_jack_firewire,
@@ -1319,7 +1329,7 @@ if os == 'linux' and dep_iio.found() and dep_gtkiostream.found()
   lib_jack_iio = library(
     'jack_iio',
     name_prefix: '',
-    cpp_args: cpp_args_jack_iio,
+    cpp_args: cpp_args_common + cpp_args_jack_iio,
     sources: src_jack_iio,
     include_directories: include_jack_iio,
     dependencies: deps_jack_iio,
@@ -1334,7 +1344,7 @@ if os == 'darwin' and dep_audiounit.found() and dep_coreaudio.found() and dep_co
   lib_jack_coreaudio = library(
     'jack_coreaudio',
     name_prefix: '',
-    cpp_args: cpp_args_jack_coreaudio,
+    cpp_args: cpp_args_common + cpp_args_jack_coreaudio,
     sources: src_jack_coreaudio,
     include_directories: include_jack_coreaudio,
     dependencies: deps_jack_coreaudio,
@@ -1349,7 +1359,7 @@ if os == 'darwin' and dep_audiounit.found() and dep_coremidi.found() and dep_cor
   lib_jack_coremidi = library(
     'jack_coremidi',
     name_prefix: '',
-    cpp_args: cpp_args_jack_coremidi,
+    cpp_args: cpp_args_common + cpp_args_jack_coremidi,
     sources: src_jack_coremidi,
     include_directories: include_jack_coremidi,
     dependencies: deps_jack_coremidi,
@@ -1364,7 +1374,7 @@ if os == 'sunos' and dep_oss.found()
   lib_jack_oss = library(
     'jack_oss',
     name_prefix: '',
-    cpp_args: ['-DSERVER_SIDE'],
+    cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
     sources: src_jack_oss,
     include_directories: include_jack_oss,
     dependencies: deps_jack_oss,
@@ -1377,7 +1387,7 @@ if os == 'sunos' and dep_oss.found()
   lib_jack_boomer = library(
     'jack_boomer',
     name_prefix: '',
-    cpp_args: ['-DSERVER_SIDE'],
+    cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
     sources: src_jack_boomer,
     include_directories: include_jack_boomer,
     dependencies: deps_jack_boomer,
@@ -1392,7 +1402,7 @@ if os == 'windows' and dep_portaudio.found()
   lib_jack_portaudio = library(
     'jack_portaudio',
     name_prefix: '',
-    cpp_args: ['-DSERVER_SIDE'],
+    cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
     sources: src_jack_portaudio,
     include_directories: include_jack_portaudio,
     dependencies: deps_jack_portaudio,
@@ -1407,7 +1417,7 @@ if os == 'windows' and dep_winmme.found()
   lib_jack_winmme = library(
     'jack_winmme',
     name_prefix: '',
-    cpp_args: ['-DSERVER_SIDE'],
+    cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
     sources: src_jack_winmme,
     include_directories: include_jack_winmme,
     dependencies: deps_jack_winmme,
@@ -1452,7 +1462,7 @@ pkg.generate(lib_jack,
 # executables
 exe_jackd = executable(
   'jackd',
-  cpp_args: ['-DSERVER_SIDE'],
+  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
   sources: src_jackd,
   include_directories: include_jackd,
   dependencies: deps_jackd,
