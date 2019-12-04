@@ -34,8 +34,6 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#include "config.h"
-
 #include "jackdbus.h"
 #include "controller.h"
 #include "jack/jack.h"
