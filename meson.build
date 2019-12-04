@@ -661,7 +661,7 @@ if os == 'sunos'
   # libjack
   src_jack_client += src_common + src_common_sunos + src_jack_client_posix
   cpp_args_jack_client = ['-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"']
-  include_jack_client = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  include_jack_client = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
   deps_jack_client += [lib_rt]
   link_flags_jack_client = ['-lnsl', '-lsocket']
   symbol_visibility_jack_client = 'default'
@@ -671,14 +671,14 @@ if os == 'sunos'
     '-DSERVER_SIDE',
     '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"',
   ]
-  include_jack_server = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  include_jack_server = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
   deps_jack_server += [lib_rt]
   link_flags_jack_server = ['-lnsl', '-lsocket']
   symbol_visibility_jack_server = 'default'
   # libjacknet
   src_jacknet_sunos = ['solaris/JackSolarisTime.c']
   src_jacknet += src_jacknet_posix + src_jacknet_sunos
-  include_jacknet = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  include_jacknet = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
   deps_jacknet += [lib_rt]
   link_flags_jacknet = []
   symbol_visibility_jacknet = 'hidden'
@@ -689,20 +689,20 @@ if os == 'sunos'
     '-DSERVER_SIDE',
     '-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"',
   ]
-  include_netmanager = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  include_netmanager = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
   deps_netmanager = [dep_threads, lib_dl, lib_rt]
   link_flags_netmanager = []
   symbol_visibility_netmanager = 'hidden'
   # jack/profiler
   src_profiler_sunos = ['solaris/JackSolarisTime.c']
   src_profiler += src_profiler_posix + src_profiler_sunos
-  include_profiler = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  include_profiler = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
   link_flags_profiler = []
   symbol_visibility_profiler = 'hidden'
   # jack/netadapter
   src_netadapter_sunos = ['solaris/JackSolarisTime.c']
   src_netadapter += src_netadapter_posix + src_netadapter_sunos
-  include_netadapter = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  include_netadapter = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
   link_flags_netadapter = []
   symbol_visibility_netadapter = 'hidden'
   # jack/audioadapter
@@ -756,6 +756,20 @@ if os == 'sunos'
   symbol_visibility_jack_proxy = 'default'
   if dep_oss.found()
     message('Building boomer and OSS drivers.')
+    # jack/jack_boomer
+    src_jack_boomer_sunos = ['solaris/JackSolarisTime.c']
+    src_jack_boomer += src_jack_boomer_posix + src_jack_boomer_sunos
+    include_jack_boomer = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+    deps_jack_boomer += [lib_dl]
+    link_flags_jack_boomer = []
+    symbol_visibility_jack_boomer = 'default'
+    # jack/jack_oss
+    src_jack_oss_sunos = ['solaris/JackSolarisTime.c']
+    src_jack_oss += src_jack_oss_posix + src_jack_oss_sunos
+    include_jack_oss = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+    deps_jack_oss += [lib_dl]
+    link_flags_jack_oss = []
+    symbol_visibility_jack_oss = 'default'
   endif
 endif
 
@@ -1346,11 +1360,39 @@ if os == 'darwin' and dep_audiounit.found() and dep_coremidi.found() and dep_cor
     install_dir: join_paths(get_option('libdir'), 'jack')
   )
 endif
+if os == 'sunos' and dep_oss.found()
+  lib_jack_oss = library(
+    'jack_oss',
+    name_prefix: '',
+    cpp_args: ['-DSERVER_SIDE'],
+    sources: src_jack_oss,
+    include_directories: include_jack_oss,
+    dependencies: deps_jack_oss,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_oss,
+    gnu_symbol_visibility: symbol_visibility_jack_oss,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+  lib_jack_boomer = library(
+    'jack_boomer',
+    name_prefix: '',
+    cpp_args: ['-DSERVER_SIDE'],
+    sources: src_jack_boomer,
+    include_directories: include_jack_boomer,
+    dependencies: deps_jack_boomer,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_boomer,
+    gnu_symbol_visibility: symbol_visibility_jack_boomer,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+endif
 if os == 'windows' and dep_portaudio.found()
   lib_jack_portaudio = library(
     'jack_portaudio',
     name_prefix: '',
-    cpp_args: cpp_args_jack_portaudio,
+    cpp_args: ['-DSERVER_SIDE'],
     sources: src_jack_portaudio,
     include_directories: include_jack_portaudio,
     dependencies: deps_jack_portaudio,
@@ -1365,7 +1407,7 @@ if os == 'windows' and dep_winmme.found()
   lib_jack_winmme = library(
     'jack_winmme',
     name_prefix: '',
-    cpp_args: cpp_args_jack_winmme,
+    cpp_args: ['-DSERVER_SIDE'],
     sources: src_jack_winmme,
     include_directories: include_jack_winmme,
     dependencies: deps_jack_winmme,
