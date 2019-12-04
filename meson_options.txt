@@ -9,3 +9,5 @@ option('portaudio', type: 'feature', value: 'auto', description: 'PortAudio supp
 option('systemd', type: 'feature', value: 'auto', description: 'Systemd integration')
 option('winmme', type: 'feature', value: 'auto', description: 'WinMME support')
 option('doxygen', type: 'feature', value: 'auto', description: 'Documentation')
+option('clients', type: 'integer', value: 64, description: 'Maximum number of JACK clients (default: 64)')
+option('ports-per-client', type: 'integer', value: 768, description: 'Maximum number of ports per JACK client (default: 768)')
