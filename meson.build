@@ -1,10 +1,6 @@
 project(
   'jack2',
   ['c', 'cpp'],
-  default_options: [
-    'b_pie=true',
-    'b_lto=true'
-  ],
   meson_version: '>=0.50.0',
   license: ['GPL2+', 'LGPL2.1'],
   version: '1.9.14')
@@ -30,7 +26,7 @@ if os == 'sunos'
 endif
 
 if os == 'darwin'
-  add_languages('objc')
+  add_languages('objcpp')
   dep_accelerate = dependency('Accelerate', method: 'extraframework', disabler: true)
   dep_audiounit = dependency('AudioUnit', method: 'extraframework', disabler: true)
   dep_audiotoolbox = dependency('AudioToolbox', method: 'extraframework', disabler: true)
@@ -56,7 +52,7 @@ if os == 'linux'
   dep_systemd = dependency('systemd', required: get_option('systemd'), disabler: true)
 endif
 
-dep_celt = dependency('celt', version: '>=0.11.0', required: get_option('celt'), disabler: true)
+dep_celt = dependency('celt', version: '>=0.11.0', required: get_option('celt'))
 dep_opus = dependency('opus', version: '>=0.9.0')
 dep_readline = dependency('readline')
 dep_samplerate = dependency('samplerate')
@@ -783,13 +779,21 @@ if os == 'darwin'
   link_flags_profiler = []
   symbol_visibility_profiler = 'hidden'
   # jack/netadapter
-  src_netadapter_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+  src_netadapter_darwin = [
+    'macosx/JackMachThread.mm',
+    'macosx/JackMachTime.c'
+  ]
   src_netadapter += src_netadapter_posix + src_netadapter_darwin
   include_netadapter = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
+  deps_netadapter += [dep_coreaudio]
   link_flags_netadapter = []
   symbol_visibility_netadapter = 'hidden'
   # jack/audioadapter
-  src_audioadapter_darwin = ['macosx/coreaudio/JackCoreAudioAdapter.mm']
+  src_audioadapter_darwin = [
+    'macosx/coreaudio/JackCoreAudioAdapter.mm',
+    'macosx/JackMachThread.mm',
+    'macosx/JackMachTime.c'
+  ]
   src_audioadapter += src_audioadapter_posix + src_audioadapter_darwin
   include_audioadapter = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
   deps_audioadapter += [dep_coreaudio, dep_audiounit, dep_audiotoolbox, dep_coreservices]
@@ -799,37 +803,41 @@ if os == 'darwin'
   src_jackd_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jackd += src_jackd_posix + src_jackd_darwin
   include_jackd = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
-  deps_jackd += [lib_dl]
+  deps_jackd += [dep_coreaudio, dep_coreservices, lib_dl]
   link_flags_jackd = []
   # jack/jack_dummy
   src_jack_dummy_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jack_dummy += src_jack_dummy_posix + src_jack_dummy_darwin
   include_jack_dummy = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_dummy += [dep_coreaudio]
   link_flags_jack_dummy = []
   symbol_visibility_jack_dummy = 'default'
   # jack/jack_loopback
   src_jack_loopback_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jack_loopback += src_jack_loopback_posix + src_jack_loopback_darwin
   include_jack_loopback = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_loopback += [dep_coreaudio]
   link_flags_jack_loopback = []
   symbol_visibility_jack_loopback = 'default'
   # jack/jack_net
   src_jack_net_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jack_net += src_jack_net_posix + src_jack_net_darwin
   include_jack_net = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_net += [dep_coreaudio]
   link_flags_jack_net = []
   symbol_visibility_jack_net = 'default'
   # jack/jack_netone
   src_jack_netone_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jack_netone += src_jack_netone_posix + src_jack_netone_darwin
   include_jack_netone = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_netone += [dep_coreaudio]
   link_flags_jack_netone = []
   symbol_visibility_jack_netone = 'default'
   # jack/jack_proxy
   src_jack_proxy_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jack_proxy += src_jack_proxy_posix + src_jack_proxy_darwin
   include_jack_proxy = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
-  deps_jack_proxy += [lib_dl]
+  deps_jack_proxy += [dep_coreaudio, lib_dl]
   link_flags_jack_proxy = []
   symbol_visibility_jack_proxy = 'default'
 endif
