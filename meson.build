@@ -27,12 +27,15 @@ endif
 
 if os == 'darwin'
   add_languages('objcpp')
+  lib_aften = meson.get_compiler('cpp').find_library('aften')
   dep_accelerate = dependency('Accelerate', method: 'extraframework', disabler: true)
   dep_audiounit = dependency('AudioUnit', method: 'extraframework', disabler: true)
   dep_audiotoolbox = dependency('AudioToolbox', method: 'extraframework', disabler: true)
   dep_coreaudio = dependency('CoreAudio', method: 'extraframework', disabler: true)
   dep_corefoundation = dependency('CoreFoundation', method: 'extraframework', disabler: true)
+  dep_coremidi = dependency('CoreMidi', method: 'extraframework', disabler: true)
   dep_coreservices = dependency('CoreServices', method: 'extraframework', disabler: true)
+  dep_foundation = dependency('Foundation', method: 'extraframework', disabler: true)
 endif
 
 if os == 'windows'
@@ -377,6 +380,25 @@ src_jack_oss = [
   'solaris/oss/JackOSSDriver.cpp',
 ]
 
+# sources for jack/jack_coreaudio
+src_jack_coreaudio = [
+  'macosx/coreaudio/JackCoreAudioDriver.mm',
+  'common/JackAC3Encoder.cpp'
+]
+
+# sources for jack/jack_coremidi
+src_jack_coremidi = [
+  'macosx/coremidi/JackCoreMidiInputPort.mm',
+  'macosx/coremidi/JackCoreMidiOutputPort.mm',
+  'macosx/coremidi/JackCoreMidiPhysicalInputPort.mm',
+  'macosx/coremidi/JackCoreMidiPhysicalOutputPort.mm',
+  'macosx/coremidi/JackCoreMidiVirtualInputPort.mm',
+  'macosx/coremidi/JackCoreMidiVirtualOutputPort.mm',
+  'macosx/coremidi/JackCoreMidiPort.mm',
+  'macosx/coremidi/JackCoreMidiUtil.mm',
+  'macosx/coremidi/JackCoreMidiDriver.mm'
+]
+
 if dep_celt.found()
   message('Building libjack, libjackserver, libjacknet and jack/jack_netone with legacy celt support.')
 endif
@@ -431,6 +453,12 @@ deps_jack_firewire = [dep_threads]
 
 # dependencies for jack/jack_iio
 deps_jack_iio = [dep_threads]
+
+# dependencies for jack/jack_coreaudio
+deps_jack_coreaudio = []
+
+# dependencies for jack/jack_coremidi
+deps_jack_coremidi = []
 
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
@@ -840,6 +868,28 @@ if os == 'darwin'
   deps_jack_proxy += [dep_coreaudio, lib_dl]
   link_flags_jack_proxy = []
   symbol_visibility_jack_proxy = 'default'
+  if dep_audiounit.found() and dep_coreaudio.found() and dep_coreservices.found()
+    message('Building CoreAudio driver.')
+    # jack/jack_coreaudio
+    src_jack_coreaudio_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+    src_jack_coreaudio += src_jack_coreaudio_darwin
+    cpp_args_jack_coreaudio = []
+    include_jack_coreaudio = include_directories('.', 'common/jack', 'common', 'macosx/', 'macosx/coreaudio', 'posix')
+    deps_jack_coreaudio += [dep_audiounit, dep_coreaudio, dep_coreservices, lib_aften]
+    link_flags_jack_coreaudio = []
+    symbol_visibility_jack_coreaudio = 'default'
+  endif
+  if dep_audiounit.found() and dep_coremidi.found() and dep_coreservices.found()
+    # jack/jack_coremidi
+    message('Building CoreMidi driver.')
+    src_jack_coremidi_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
+    src_jack_coremidi += src_jack_coremidi_darwin
+    cpp_args_jack_coremidi = []
+    include_jack_coremidi = include_directories('.', 'common/jack', 'common', 'macosx/', 'macosx/coremidi', 'posix')
+    deps_jack_coremidi += [dep_audiounit, dep_coreaudio, dep_coremidi, dep_coreservices, dep_foundation]
+    link_flags_jack_coremidi = []
+    symbol_visibility_jack_coremidi = 'default'
+  endif
 endif
 
 if os == 'windows'
@@ -1203,6 +1253,37 @@ if os == 'linux' and dep_iio.found() and dep_gtkiostream.found()
     install_dir: join_paths(get_option('libdir'), 'jack')
   )
 endif
+if os == 'darwin' and dep_audiounit.found() and dep_coreaudio.found() and dep_coreservices.found() and lib_aften.found()
+  lib_jack_coreaudio = library(
+    'jack_coreaudio',
+    name_prefix: '',
+    cpp_args: cpp_args_jack_coreaudio,
+    sources: src_jack_coreaudio,
+    include_directories: include_jack_coreaudio,
+    dependencies: deps_jack_coreaudio,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_coreaudio,
+    gnu_symbol_visibility: symbol_visibility_jack_coreaudio,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+endif
+if os == 'darwin' and dep_audiounit.found() and dep_coremidi.found() and dep_coreservices.found() and dep_foundation.found()
+  lib_jack_coremidi = library(
+    'jack_coremidi',
+    name_prefix: '',
+    cpp_args: cpp_args_jack_coremidi,
+    sources: src_jack_coremidi,
+    include_directories: include_jack_coremidi,
+    dependencies: deps_jack_coremidi,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_coremidi,
+    gnu_symbol_visibility: symbol_visibility_jack_coremidi,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+endif
+
 
 # headers
 install_headers(
