@@ -827,7 +827,7 @@ if os == 'darwin'
   symbol_visibility_jack_netone = 'default'
   # jack/jack_proxy
   src_jack_proxy_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
-  src_jack_proxy += src_jack_proxy_posix + src_jack_proxy_sunos
+  src_jack_proxy += src_jack_proxy_posix + src_jack_proxy_darwin
   include_jack_proxy = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
   deps_jack_proxy += [lib_dl]
   link_flags_jack_proxy = []
