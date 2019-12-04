@@ -10,6 +10,11 @@ os = build_machine.system()
 conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
 
+# languages
+if os == 'darwin'
+  add_languages('objcpp')
+endif
+
 # c library dependencies
 lib_dl = meson.get_compiler('c').find_library('dl')
 lib_m = meson.get_compiler('c').find_library('m')
@@ -20,14 +25,23 @@ if os in ['linux', 'sunos']
   lib_rt = meson.get_compiler('c').find_library('rt')
 endif
 
+if os == 'darwin'
+  lib_aften = meson.get_compiler('cpp').find_library('aften')
+endif
+
 # package dependencies
+dep_celt = dependency('celt', version: '>=0.11.0', required: get_option('celt'))
+dep_opus = dependency('opus', version: '>=0.9.0')
+dep_readline = dependency('readline')
+dep_samplerate = dependency('samplerate')
+dep_sndfile = dependency('sndfile')
+dep_threads = dependency('threads')
+
 if os == 'sunos'
-  dep_oss = dependency('oss')
+  dep_oss = dependency('oss', required: get_option('oss'))
 endif
 
 if os == 'darwin'
-  add_languages('objcpp')
-  lib_aften = meson.get_compiler('cpp').find_library('aften')
   dep_accelerate = dependency('Accelerate', method: 'extraframework', disabler: true)
   dep_audiounit = dependency('AudioUnit', method: 'extraframework', disabler: true)
   dep_audiotoolbox = dependency('AudioToolbox', method: 'extraframework', disabler: true)
@@ -42,25 +56,21 @@ if os == 'windows'
   dep_regex = dependency('REGEX')
   dep_ws2_32 = dependency('WS2_32')
   dep_psapi = dependency('PSAPI')
-  dep_portaudio = dependency('portaudio')
-  dep_winmm = dependency('WINMM')
+  dep_portaudio = dependency('portaudio', required: get_option('portaudio'))
+  dep_winmm = dependency('WINMM', required: get_option('winmme'))
 endif
 
 if os == 'linux'
   dep_alsa = dependency('alsa', version: '>=1.0.18', required: get_option('alsa'), disabler: true)
-  dep_dbus = dependency('dbus-1', version: '>=1.0.0', required: get_option('dbus'), disabler: true)
   dep_ffado = dependency('libffado', version: '>=1.999.17', required: get_option('ffado'), disabler: true)
   dep_iio = dependency('libiio', version: '>=0.16', required: get_option('iio'), disabler: true)
   dep_gtkiostream = dependency('gtkIOStream', version: '>=1.7.0', required: get_option('iio'), disabler: true)
   dep_systemd = dependency('systemd', required: get_option('systemd'), disabler: true)
 endif
 
-dep_celt = dependency('celt', version: '>=0.11.0', required: get_option('celt'))
-dep_opus = dependency('opus', version: '>=0.9.0')
-dep_readline = dependency('readline')
-dep_samplerate = dependency('samplerate')
-dep_sndfile = dependency('sndfile')
-dep_threads = dependency('threads')
+if os in ['darwin', 'linux', 'sunos']
+  dep_dbus = dependency('dbus-1', version: '>=1.0.0', required: get_option('dbus'), disabler: true)
+endif
 
 doxygen = find_program('doxygen', required : get_option('doxygen'), disabler: true)
 
@@ -399,6 +409,20 @@ src_jack_coremidi = [
   'macosx/coremidi/JackCoreMidiDriver.mm'
 ]
 
+# sources for jack/jack_portaudio
+src_jack_portaudio = [
+  'windows/portaudio/JackPortAudioDevices.cpp',
+  'windows/portaudio/JackPortAudioDriver.cpp',
+]
+
+# sources for jack/jack_winmme
+src_jack_winmme = [
+  'windows/winmme/JackWinMMEDriver.cpp',
+  'windows/winmme/JackWinMMEInputPort.cpp',
+  'windows/winmme/JackWinMMEOutputPort.cpp',
+  'windows/winmme/JackWinMMEPort.cpp',
+]
+
 if dep_celt.found()
   message('Building libjack, libjackserver, libjacknet and jack/jack_netone with legacy celt support.')
 endif
@@ -460,6 +484,12 @@ deps_jack_coreaudio = []
 # dependencies for jack/jack_coremidi
 deps_jack_coremidi = []
 
+# dependencies for jack/jack_portaudio
+deps_jack_portaudio = []
+
+# dependencies for jack/jack_winmme
+deps_jack_winmme = []
+
 # platform specific overrides for sources, includes, dependencies and linker flags
 if os == 'linux'
   src_common_linux = [
@@ -476,18 +506,6 @@ if os == 'linux'
   cpp_args_jack_client = ['-DADDON_DIR="' + join_paths(get_option('prefix'), get_option('libdir'), '/jack') + '"']
   src_jack_client += src_common + src_common_linux + src_jack_client_posix
   include_jack_client = include_directories('.', 'common/jack', 'common', 'linux', 'linux/alsa', 'posix')
-  if dep_dbus.found() and get_option('autostart-method') == 'dbus'
-    message('Automatic starting through clients is done with D-Bus activation.')
-    cpp_args_jack_client += ['-DUSE_LIBDBUS_AUTOLAUNCH=1']
-    deps_jack_client += [dep_dbus]
-  endif
-  if get_option('autostart-method') == 'classic'
-    message('Automatic starting through clients is done with daemon activation.')
-    cpp_args_jack_client += [
-      '-DUSE_CLASSIC_AUTOLAUNCH=1',
-      '-DJACK_LOCATION="' + join_paths(get_option('prefix'), get_option('bindir')) + '"'
-    ]
-  endif
   deps_jack_client += [lib_rt, lib_dl]
   link_flags_jack_client = []
   symbol_visibility_jack_client = 'hidden'
@@ -551,15 +569,6 @@ if os == 'linux'
   if dep_systemd.found()
     message('Compiling jackd with systemd support.')
     deps_jackd += [dep_systemd]
-  endif
-  if dep_dbus.found()
-    message('Compiling jackd with D-Bus support.')
-    src_jackd_linux_dbus = [
-      'dbus/audio_reserve.c',
-      'dbus/reserve.c',
-    ]
-    src_jackd += src_jackd_linux_dbus
-    deps_jackd += [dep_dbus]
   endif
   link_flags_jackd = []
   # jack/jack_dummy
@@ -1039,6 +1048,60 @@ if os == 'windows'
   include_jack_proxy = include_directories('.', 'common/jack', 'common', 'windows')
   link_flags_jack_proxy = []
   symbol_visibility_jack_proxy = 'default'
+  if dep_portaudio.found()
+    # jack/jack_portaudio
+    message('Building PortAudio driver.')
+    src_jack_portaudio_windows = [
+      'windows/JackNetWinSocket.cpp',
+      'windows/JackWinThread.cpp',
+      'windows/JackMMCSS.cpp',
+      'windows/JackWinTime.c',
+    ]
+    src_jack_portaudio += src_jack_portaudio_windows
+    include_jack_portaudio = include_directories('.', 'common/jack', 'common', 'windows')
+    deps_jack_portaudio += [dep_portaudio]
+    link_flags_jack_portaudio = []
+    symbol_visibility_jack_portaudio = 'default'
+  endif
+  if dep_winmme.found()
+    # jack/jack_winmme
+    message('Building WinMME driver.')
+    src_jack_winmme_windows = [
+      'windows/JackNetWinSocket.cpp',
+      'windows/JackWinThread.cpp',
+      'windows/JackMMCSS.cpp',
+      'windows/JackWinTime.c',
+    ]
+    src_jack_winmme += src_jack_winmme_windows
+    include_jack_winmme = include_directories('.', 'common/jack', 'common', 'windows')
+    deps_jack_winmme += [dep_winmme]
+    link_flags_jack_winmme = []
+    symbol_visibility_jack_winmme = 'default'
+  endif
+endif
+
+if os in ['darwin', 'linux', 'sunos']
+  if dep_dbus.found() and get_option('autostart-method') == 'dbus'
+    message('Automatic starting through clients is done with D-Bus activation.')
+    cpp_args_jack_client += ['-DUSE_LIBDBUS_AUTOLAUNCH=1']
+    deps_jack_client += [dep_dbus]
+  endif
+  if get_option('autostart-method') == 'classic'
+    message('Automatic starting through clients is done with daemon activation.')
+    cpp_args_jack_client += [
+      '-DUSE_CLASSIC_AUTOLAUNCH=1',
+      '-DJACK_LOCATION="' + join_paths(get_option('prefix'), get_option('bindir')) + '"'
+    ]
+  endif
+  if dep_dbus.found()
+    message('Compiling jackd with D-Bus support.')
+    src_jackd_linux_dbus = [
+      'dbus/audio_reserve.c',
+      'dbus/reserve.c',
+    ]
+    src_jackd += src_jackd_linux_dbus
+    deps_jackd += [dep_dbus]
+  endif
 endif
 
 # libraries
@@ -1283,7 +1346,36 @@ if os == 'darwin' and dep_audiounit.found() and dep_coremidi.found() and dep_cor
     install_dir: join_paths(get_option('libdir'), 'jack')
   )
 endif
-
+if os == 'windows' and dep_portaudio.found()
+  lib_jack_portaudio = library(
+    'jack_portaudio',
+    name_prefix: '',
+    cpp_args: cpp_args_jack_portaudio,
+    sources: src_jack_portaudio,
+    include_directories: include_jack_portaudio,
+    dependencies: deps_jack_portaudio,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_portaudio,
+    gnu_symbol_visibility: symbol_visibility_jack_portaudio,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+endif
+if os == 'windows' and dep_winmme.found()
+  lib_jack_winmme = library(
+    'jack_winmme',
+    name_prefix: '',
+    cpp_args: cpp_args_jack_winmme,
+    sources: src_jack_winmme,
+    include_directories: include_jack_winmme,
+    dependencies: deps_jack_winmme,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jack_winmme,
+    gnu_symbol_visibility: symbol_visibility_jack_winmme,
+    install: true,
+    install_dir: join_paths(get_option('libdir'), 'jack')
+  )
+endif
 
 # headers
 install_headers(
