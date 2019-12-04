@@ -56,7 +56,7 @@ if os == 'linux'
   dep_systemd = dependency('systemd', required: get_option('systemd'), disabler: true)
 endif
 
-dep_celt = dependency('celt', version: '>=0.11.0')
+dep_celt = dependency('celt', version: '>=0.11.0', required: get_option('celt'), disabler: true)
 dep_opus = dependency('opus', version: '>=0.9.0')
 dep_readline = dependency('readline')
 dep_samplerate = dependency('samplerate')
@@ -380,6 +380,10 @@ src_jack_oss = [
   'common/memops.c',
   'solaris/oss/JackOSSDriver.cpp',
 ]
+
+if dep_celt.found()
+  message('Building libjack, libjackserver, libjacknet and jack/jack_netone with legacy celt support.')
+endif
 
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
