@@ -11,6 +11,7 @@ conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
 conf_data.set('clients', get_option('clients'))
 conf_data.set('ports-per-client', get_option('ports-per-client'))
+conf_data.set10('profiling', get_option('profiling'))
 
 # languages
 if os == 'darwin'
@@ -455,10 +456,12 @@ src_jack_winmme = [
 # cpp_args
 cpp_args_common = [
   '-DCLIENT_NUM=@0@'.format(conf_data.get('clients')),
-  '-DPORT_NUM_FOR_CLIENT=@0@'.format(conf_data.get('ports-per-client'))
+  '-DPORT_NUM_FOR_CLIENT=@0@'.format(conf_data.get('ports-per-client')),
+  '-DJACK_MONITOR=@0@'.format(conf_data.get('profiling')),
 ]
 message('Maximum number of JACK clients: @0@'.format(conf_data.get('clients')))
 message('Maximum number of ports per JACK client: @0@'.format(conf_data.get('ports-per-client')))
+message('Build with engine profiling: @0@'.format(conf_data.get('profiling')))
 
 # dependencies for libjack
 deps_jack_client = [dep_threads, dep_celt, dep_opus, lib_db]
