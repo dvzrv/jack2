@@ -72,6 +72,7 @@ endif
 
 if os in ['darwin', 'linux', 'sunos']
   dep_dbus = dependency('dbus-1', version: '>=1.0.0', required: get_option('dbus'), disabler: true)
+  dep_expat = dependency('expat', required: get_option('dbus'), disabler: true)
 endif
 
 doxygen = find_program('doxygen', required : get_option('doxygen'), disabler: true)
@@ -247,6 +248,32 @@ src_jackd = [
   'common/JackMessageBuffer.cpp',
 ]
 src_jackd_posix = [
+  'posix/JackPosixProcessSync.cpp',
+  'posix/JackPosixThread.cpp',
+]
+
+# sources for jackdbus
+src_jackdbus = [
+  'dbus/jackdbus.c',
+  'dbus/controller.c',
+  'dbus/params.c',
+  'dbus/controller_iface_configure.c',
+  'dbus/controller_iface_control.c',
+  'dbus/controller_iface_introspectable.c',
+  'dbus/controller_iface_patchbay.c',
+  'dbus/controller_iface_session_manager.c',
+  'dbus/controller_iface_transport.c',
+  'dbus/xml.c',
+  'dbus/xml_expat.c',
+  #'dbus/xml_nop.c',
+  'dbus/xml_write_raw.c',
+  'dbus/sigsegv.c',
+  'dbus/reserve.c',
+  'common/JackError.cpp',
+  'common/JackGlobals.cpp',
+  'common/JackMessageBuffer.cpp',
+]
+src_jackdbus_posix = [
   'posix/JackPosixProcessSync.cpp',
   'posix/JackPosixThread.cpp',
 ]
@@ -457,6 +484,9 @@ deps_audioadapter = [dep_threads, dep_samplerate]
 # dependencies for jackd
 deps_jackd = [dep_threads]
 
+# dependencies for jackd
+deps_jackdbus = [dep_threads]
+
 # dependencies for jack/jack_dummy
 deps_jack_dummy = [dep_threads]
 
@@ -581,6 +611,18 @@ if os == 'linux'
     deps_jackd += [dep_systemd]
   endif
   link_flags_jackd = []
+  # jackdbus
+  if dep_dbus.found() and dep_expat.found()
+    message('Building jackdbus.')
+    src_jackdbus_linux = [
+      'linux/uptime.c',
+      'linux/JackLinuxTime.c'
+    ]
+    src_jackdbus += src_jackdbus_posix + src_jackdbus_linux
+    include_jackdbus = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+    deps_jackdbus += [dep_expat, dep_dbus, lib_dl, lib_rt, lib_stdcpp]
+    link_flags_jackdbus = []
+  endif
   # jack/jack_dummy
   src_jack_dummy_linux = ['linux/JackLinuxTime.c']
   src_jack_dummy += src_jack_dummy_posix + src_jack_dummy_linux
@@ -866,6 +908,19 @@ if os == 'darwin'
   include_jackd = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
   deps_jackd += [dep_coreaudio, dep_coreservices, lib_dl]
   link_flags_jackd = []
+  # jackdbus
+  if dep_dbus.found() and dep_expat.found()
+    message('Building jackdbus.')
+    src_jackdbus_darwin = [
+      'macosx/uptime.c',
+      'macosx/JackMachThread.mm',
+      'macosx/JackMachTime.c'
+    ]
+    src_jackdbus += src_jackdbus_posix + src_jackdbus_darwin
+    include_jackdbus = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+    deps_jackdbus += [dep_coreaudio, dep_expat, dep_dbus, lib_dl]
+    link_flags_jackdbus = []
+  endif
   # jack/jack_dummy
   src_jack_dummy_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jack_dummy += src_jack_dummy_posix + src_jack_dummy_darwin
@@ -1471,6 +1526,20 @@ exe_jackd = executable(
   install: true
 )
 
+if os in ['darwin', 'linux', 'sunos'] and dep_dbus.found() and dep_expat.found()
+  exe_jackdbus = executable(
+    'jackdbus',
+    cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
+    sources: src_jackdbus,
+    include_directories: include_jackdbus,
+    dependencies: deps_jackdbus,
+    link_with: [lib_jackserver],
+    link_args: link_flags_jackdbus,
+    install: true
+  )
+endif
+
+
 # system integration
 if os == 'linux' and dep_systemd.found()
   config_systemd = configuration_data(
@@ -1489,5 +1558,18 @@ if os == 'linux' and dep_systemd.found()
     copy: true,
     install: true,
     install_dir: join_paths(get_option('sysconfdir'), 'jack')
+  )
+endif
+
+if os in ['darwin', 'linux', 'sunos'] and dep_dbus.found() and dep_expat.found()
+  config_dbus = configuration_data(
+    {'BINDIR': join_paths(get_option('prefix'), get_option('bindir'))}
+  )
+  configure_file(
+    input: 'dbus/org.jackaudio.service.in',
+    output: 'org.jackaudio.service',
+    install: true,
+    install_dir: dep_dbus.get_pkgconfig_variable('session_bus_services_dir'),
+    configuration: config_dbus
   )
 endif
