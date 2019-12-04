@@ -645,7 +645,7 @@ if os == 'sunos'
   # libjacknet
   src_jacknet_sunos = ['solaris/JackSolarisTime.c']
   src_jacknet += src_jacknet_posix + src_jacknet_sunos
-  include_jack_server = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
+  include_jacknet = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
   deps_jacknet += [lib_rt]
   link_flags_jacknet = []
   symbol_visibility_jacknet = 'hidden'
@@ -760,7 +760,7 @@ if os == 'darwin'
   # libjacknet
   src_jacknet_darwin = ['macosx/JackMachThread.mm', 'macosx/JackMachTime.c']
   src_jacknet += src_jacknet_posix + src_jacknet_darwin
-  include_jack_server = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
+  include_jacknet = include_directories('.', 'common/jack', 'common', 'macosx', 'macosx/coreaudio', 'posix')
   deps_jacknet += [dep_coreaudio]
   link_flags_jacknet = ['-single_module']
   symbol_visibility_jacknet = 'hidden'
@@ -865,7 +865,7 @@ if os == 'windows'
     'windows/JackMMCSS.cpp',
     'windows/JackWinTime.c']
   src_jacknet += src_jacknet_windows
-  include_jack_server = include_directories('.', 'common/jack', 'common', 'windows')
+  include_jacknet = include_directories('.', 'common/jack', 'common', 'windows')
   deps_jacknet += [dep_winmm, dep_ws2_32]
   link_flags_jacknet = []
   symbol_visibility_jacknet = 'default'
