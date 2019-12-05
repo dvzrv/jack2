@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+set -eu
+
+ln -sv "$2" "$MESON_INSTALL_DESTDIR_PREFIX/$2/$3"
