@@ -453,6 +453,182 @@ src_jack_winmme = [
   'windows/winmme/JackWinMMEPort.cpp',
 ]
 
+# sources for jack_freewheel
+src_jack_freewheel = [
+  'example-clients/freewheel.c',
+]
+
+# sources for jack_connect
+src_jack_connect = [
+  'example-clients/connect.c',
+]
+
+# sources for jack_lsp
+src_jack_lsp = [
+  'example-clients/lsp.c',
+]
+
+# sources for jack_metro
+src_jack_metro = [
+  'example-clients/metro.c',
+]
+
+# sources for jack_midiseq
+src_jack_midiseq = [
+  'example-clients/midiseq.c',
+]
+
+# sources for jack_midisine
+src_jack_midisine = [
+  'example-clients/midisine.c',
+]
+
+# sources for jack_showtime
+src_jack_showtime = [
+  'example-clients/showtime.c',
+]
+
+# sources for jack_simple_client
+src_jack_simple_client = [
+  'example-clients/simple_client.c',
+]
+
+# sources for jack_zombie
+src_jack_zombie = [
+  'example-clients/zombie.c',
+]
+
+# sources for jack_load
+src_jack_load = [
+  'example-clients/ipload.c',
+]
+
+# sources for jack_unload
+src_jack_unload = [
+  'example-clients/ipunload.c',
+]
+
+# sources for jack_alias
+src_jack_alias = [
+  'example-clients/alias.c',
+]
+
+# sources for jack_bufsize
+src_jack_bufsize = [
+  'example-clients/bufsize.c',
+]
+
+# sources for jack_wait
+src_jack_wait = [
+  'example-clients/wait.c',
+]
+
+# sources for jack_samplerate
+src_jack_samplerate = [
+  'example-clients/samplerate.c',
+]
+
+# sources for jack_evmon
+src_jack_evmon = [
+  'example-clients/evmon.c',
+]
+
+# sources for jack_monitor_client
+src_jack_monitor_client = [
+  'example-clients/monitor_client.c',
+]
+
+# sources for jack_thru
+src_jack_thru = [
+  'example-clients/thru_client.c',
+]
+
+# sources for jack_cpu_load
+src_jack_cpu_load = [
+  'example-clients/cpu_load.c',
+]
+
+# sources for jack_simple_session_client
+src_jack_simple_session_client = [
+  'example-clients/simple_session_client.c',
+]
+
+# sources for jack_session_notify
+src_jack_session_notify = [
+  'example-clients/session_notify.c',
+]
+
+# sources for jack_server_control
+src_jack_server_control = [
+  'example-clients/server_control.cpp',
+]
+
+# sources for jack_net_slave
+src_jack_net_slave = [
+  'example-clients/netslave.c',
+]
+
+# sources for jack_net_master
+src_jack_net_master = [
+  'example-clients/netmaster.c',
+]
+
+# sources for jack_latent_client
+src_jack_latent_client = [
+  'example-clients/latent_client.c',
+]
+
+# sources for jack_midi_dump
+src_jack_midi_dump = [
+  'example-clients/midi_dump.c',
+]
+
+# sources for jack_midi_latency_test
+src_jack_midi_latency_test = [
+  'example-clients/midi_latency_test.c',
+]
+
+# sources for jack_simdtests
+src_jack_simdtests = [
+  'example-clients/simdtests.cpp',
+]
+
+# sources for jack_property
+src_jack_property = [
+  'example-clients/property.c',
+]
+
+# sources for jack_transport
+src_jack_transport = [
+  'example-clients/transport.c',
+]
+
+# sources for jack_rec
+src_jack_rec = [
+  'example-clients/capture_client.c',
+]
+
+# sources for jack_netsource
+src_jack_netsource = [
+  'example-clients/netsource.c',
+  'common/netjack_packet.c'
+]
+
+# sources for alsa_in
+src_alsa_in = [
+  'example-clients/alsa_in.c',
+  'common/memops.c'
+]
+
+# sources for alsa_out
+src_alsa_out = [
+  'example-clients/alsa_out.c',
+  'common/memops.c'
+]
+
+# sources for inprocess
+src_inprocess = ['example-clients/inprocess.c']
+
 # cpp_args
 cpp_args_common = [
   '-DCLIENT_NUM=@0@'.format(conf_data.get('clients')),
@@ -529,8 +705,113 @@ deps_jack_portaudio = []
 # dependencies for jack/jack_winmme
 deps_jack_winmme = []
 
+# dependencies for jack_freewheel
+deps_jack_freewheel = []
+
+# dependencies for jack_connect
+deps_jack_connect = []
+
+# dependencies for jack_lsp
+deps_jack_lsp = []
+
+# dependencies for jack_metro
+deps_jack_metro = []
+
+# dependencies for jack_midiseq
+deps_jack_midiseq = []
+
+# dependencies for jack_midisine
+deps_jack_midisine = []
+
+# dependencies for jack_showtime
+deps_jack_showtime = []
+
+# dependencies for jack_simple_client
+deps_jack_simple_client = []
+
+# dependencies for jack_zombie
+deps_jack_zombie = []
+
+# dependencies for jack_load
+deps_jack_load = []
+
+# dependencies for jack_unload
+deps_jack_unload = []
+
+# dependencies for jack_alias
+deps_jack_alias = []
+
+# dependencies for jack_bufsize
+deps_jack_bufsize = []
+
+# dependencies for jack_wait
+deps_jack_wait = []
+
+# dependencies for jack_samplerate
+deps_jack_samplerate = []
+
+# dependencies for jack_evmon
+deps_jack_evmon = []
+
+# dependencies for jack_monitor_client
+deps_jack_monitor_client = []
+
+# dependencies for jack_thru
+deps_jack_thru = []
+
+# dependencies for jack_cpu_load
+deps_jack_cpu_load = []
+
+# dependencies for jack_simple_session_client
+deps_jack_simple_session_client = []
+
+# dependencies for jack_session_notify
+deps_jack_session_notify = []
+
+# dependencies for jack_server_control
+deps_jack_server_control = [lib_stdcpp]
+
+# dependencies for jack_net_slave
+deps_jack_net_slave = []
+
+# dependencies for jack_net_master
+deps_jack_net_master = []
+
+# dependencies for jack_latent_client
+deps_jack_latent_client = []
+
+# dependencies for jack_midi_dump
+deps_jack_midi_dump = [dep_threads]
+
+# dependencies for jack_midi_latency_test
+deps_jack_midi_latency_test = [dep_threads]
+
+# dependencies for jack_simdtests
+deps_jack_simdtests = []
+
+# dependencies for jack_property
+deps_jack_property = []
+
+# dependencies for jack_transport
+deps_jack_transport = [dep_readline]
+
+# dependencies for jack_rec
+deps_jack_rec = [dep_sndfile, dep_threads]
+
+# dependencies for jack_netsource
+deps_jack_netsource = [dep_celt, dep_opus, dep_samplerate, lib_m]
+
+# dependencies for alsa_in
+deps_alsa_in = [dep_samplerate, lib_m]
+
+# dependencies for alsa_out
+deps_alsa_out = [dep_samplerate, lib_m]
+
+# dependencies for inprocess
+deps_inprocess = []
+
 if dep_celt.found()
-  message('Compiling libjack, libjackserver, libjacknet and jack/jack_netone with legacy celt support.')
+  message('Compiling libjack, libjackserver, libjacknet, jack/jack_netone and jack_netsource with legacy celt support.')
 endif
 
 # platform specific overrides for sources, includes, dependencies and linker flags
@@ -699,6 +980,144 @@ if os == 'linux'
     link_flags_jack_iio = []
     symbol_visibility_jack_iio = 'default'
   endif
+  # jack_freewheel
+  include_jack_freewheel = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_freewheel += [lib_m, lib_rt]
+  link_flags_jack_freewheel = []
+  # jack_connect
+  include_jack_connect = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_connect += [lib_m, lib_rt]
+  link_flags_jack_connect = []
+  # jack_lsp
+  include_jack_lsp = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_lsp += [lib_m, lib_rt]
+  link_flags_jack_lsp = []
+  # jack_metro
+  include_jack_metro = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_metro += [lib_m, lib_rt]
+  link_flags_jack_metro = []
+  # jack_midiseq
+  include_jack_midiseq = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_midiseq += [lib_m, lib_rt]
+  link_flags_jack_midiseq = []
+  # jack_midisine
+  include_jack_midisine = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_midisine += [lib_m, lib_rt]
+  link_flags_jack_midisine = []
+  # jack_showtime
+  include_jack_showtime = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_showtime += [lib_m, lib_rt]
+  link_flags_jack_showtime = []
+  # jack_simple_client
+  include_jack_simple_client = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_simple_client += [lib_m, lib_rt]
+  link_flags_jack_simple_client = []
+  # jack_zombie
+  include_jack_zombie = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_zombie += [lib_m, lib_rt]
+  link_flags_jack_zombie = []
+  # jack_load
+  include_jack_load = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_load += [lib_m, lib_rt]
+  link_flags_jack_load = []
+  # jack_unload
+  include_jack_unload = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_unload += [lib_m, lib_rt]
+  link_flags_jack_unload = []
+  # jack_alias
+  include_jack_alias = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_alias += [lib_m, lib_rt]
+  link_flags_jack_alias = []
+  # jack_bufsize
+  include_jack_bufsize = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_bufsize += [lib_m, lib_rt]
+  link_flags_jack_bufsize = []
+  # jack_wait
+  include_jack_wait = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_wait += [lib_m, lib_rt]
+  link_flags_jack_wait = []
+  # jack_samplerate
+  include_jack_samplerate = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_samplerate += [lib_m, lib_rt]
+  link_flags_jack_samplerate = []
+  # jack_evmon
+  include_jack_evmon = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_evmon += [lib_m, lib_rt]
+  link_flags_jack_evmon = []
+  # jack_monitor_client
+  include_jack_monitor_client = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_monitor_client += [lib_m, lib_rt]
+  link_flags_jack_monitor_client = []
+  # jack_thru
+  include_jack_thru = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_thru += [lib_m, lib_rt]
+  link_flags_jack_thru = []
+  # jack_cpu_load
+  include_jack_cpu_load = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_cpu_load += [lib_m, lib_rt]
+  link_flags_jack_cpu_load = []
+  # jack_simple_session_client
+  include_jack_simple_session_client = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_simple_session_client += [lib_m, lib_rt]
+  link_flags_jack_simple_session_client = []
+  # jack_session_notify
+  include_jack_session_notify = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_session_notify += [lib_m, lib_rt]
+  link_flags_jack_session_notify = []
+  # jack_server_control
+  include_jack_server_control = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_server_control += [lib_m, lib_rt]
+  link_flags_jack_server_control = []
+  # jack_net_slave
+  include_jack_net_slave = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_net_slave += [lib_m, lib_rt]
+  link_flags_jack_net_slave = []
+  # jack_net_master
+  include_jack_net_master = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_net_master += [lib_m, lib_rt]
+  link_flags_jack_net_master = []
+  # jack_latent_client
+  include_jack_latent_client = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_latent_client += [lib_m, lib_rt]
+  link_flags_jack_latent_client = []
+  # jack_midi_dump
+  include_jack_midi_dump = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_midi_dump += [lib_m, lib_rt]
+  link_flags_jack_midi_dump = []
+  # jack_midi_latency_test
+  include_jack_midi_latency_test = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_midi_latency_test += [lib_m, lib_rt]
+  link_flags_jack_midi_latency_test = []
+  # jack_simdtests
+  include_jack_simdtests = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_simdtests += [lib_m, lib_rt]
+  link_flags_jack_simdtests = []
+  # jack_property
+  include_jack_property = include_directories('.', 'common/jack', 'common', 'linux', 'posix')
+  deps_jack_property += [lib_m, lib_rt]
+  link_flags_jack_property = []
+  # jack_transport
+  include_jack_transport = include_directories('.', 'common/jack', 'common')
+  deps_jack_transport += [lib_rt]
+  link_flags_jack_transport = []
+  # jack_rec
+  include_jack_rec = include_directories('.', 'common/jack', 'common')
+  deps_jack_rec += [lib_rt]
+  link_flags_jack_rec = []
+  # jack_netsource
+  include_jack_netsource = include_directories('.', 'common/jack', 'common', 'posix')
+  link_flags_jack_netsource = []
+  # alsa_in
+  include_alsa_in = include_directories('.', 'common/jack', 'common')
+  deps_alsa_in += [dep_alsa]
+  link_flags_alsa_in = []
+  # alsa_out
+  include_alsa_out = include_directories('.', 'common/jack', 'common')
+  deps_alsa_out += [dep_alsa]
+  link_flags_alsa_out = []
+  # jack/inprocess
+  include_inprocess = include_directories('.', 'common/jack', 'common')
+  link_flags_inprocess = []
 endif
 
 if os == 'sunos'
@@ -826,6 +1245,137 @@ if os == 'sunos'
     link_flags_jack_oss = []
     symbol_visibility_jack_oss = 'default'
   endif
+  # jack_freewheel
+  include_jack_freewheel = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_freewheel += [lib_m]
+  link_flags_jack_freewheel = []
+  # jack_connect
+  include_jack_connect = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_connect += [lib_m]
+  link_flags_jack_connect = []
+  # jack_lsp
+  include_jack_lsp = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_lsp += [lib_m]
+  link_flags_jack_lsp = []
+  # jack_metro
+  include_jack_metro = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_metro += [lib_m]
+  link_flags_jack_metro = []
+  # jack_midiseq
+  include_jack_midiseq = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_midiseq += [lib_m]
+  link_flags_jack_midiseq = []
+  # jack_midisine
+  include_jack_midisine = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_midisine += [lib_m]
+  link_flags_jack_midisine = []
+  # jack_showtime
+  include_jack_showtime = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_showtime += [lib_m]
+  link_flags_jack_showtime = []
+  # jack_simple_client
+  include_jack_simple_client = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_simple_client += [lib_m]
+  link_flags_jack_simple_client = []
+  # jack_zombie
+  include_jack_zombie = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_zombie += [lib_m]
+  link_flags_jack_zombie = []
+  # jack_load
+  include_jack_load = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_load += [lib_m]
+  link_flags_jack_load = []
+  # jack_unload
+  include_jack_unload = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_unload += [lib_m]
+  link_flags_jack_unload = []
+  # jack_alias
+  include_jack_alias = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_alias += [lib_m]
+  link_flags_jack_alias = []
+  # jack_bufsize
+  include_jack_bufsize = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_bufsize += [lib_m]
+  link_flags_jack_bufsize = []
+  # jack_wait
+  include_jack_wait = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_wait += [lib_m]
+  link_flags_jack_wait = []
+  # jack_samplerate
+  include_jack_samplerate = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_samplerate += [lib_m]
+  link_flags_jack_samplerate = []
+  # jack_evmon
+  include_jack_evmon = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_evmon += [lib_m]
+  link_flags_jack_evmon = []
+  # jack_monitor_client
+  include_jack_monitor_client = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_monitor_client += [lib_m]
+  link_flags_jack_monitor_client = []
+  # jack_thru
+  include_jack_thru = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_thru += [lib_m]
+  link_flags_jack_thru = []
+  # jack_cpu_load
+  include_jack_cpu_load = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_cpu_load += [lib_m]
+  link_flags_jack_cpu_load = []
+  # jack_simple_session_client
+  include_jack_simple_session_client = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_simple_session_client += [lib_m]
+  link_flags_jack_simple_session_client = []
+  # jack_session_notify
+  include_jack_session_notify = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_session_notify += [lib_m]
+  link_flags_jack_session_notify = []
+  # jack_server_control
+  include_jack_server_control = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_server_control += [lib_m]
+  link_flags_jack_server_control = []
+  # jack_net_slave
+  include_jack_net_slave = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_net_slave += [lib_m]
+  link_flags_jack_net_slave = []
+  # jack_net_master
+  include_jack_net_master = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_net_master += [lib_m]
+  link_flags_jack_net_master = []
+  # jack_latent_client
+  include_jack_latent_client = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_latent_client += [lib_m]
+  link_flags_jack_latent_client = []
+  # jack_midi_dump
+  include_jack_midi_dump = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_midi_dump += [lib_m]
+  link_flags_jack_midi_dump = []
+  # jack_midi_latency_test
+  include_jack_midi_latency_test = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_midi_latency_test += [lib_m]
+  link_flags_jack_midi_latency_test = []
+  # jack_simdtests
+  include_jack_simdtests = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_simdtests += [lib_m]
+  link_flags_jack_simdtests = []
+  # jack_property
+  include_jack_property = include_directories('.', 'common/jack', 'common', 'solaris', 'posix')
+  deps_jack_property += [lib_m]
+  link_flags_jack_property = []
+  # jack_transport
+  include_jack_transport = include_directories('.', 'common/jack', 'common')
+  deps_jack_transport += []
+  link_flags_jack_transport = []
+  # jack_rec
+  include_jack_rec = include_directories('.', 'common/jack', 'common')
+  deps_jack_rec += [lib_rt]
+  link_flags_jack_rec = []
+  # jack_netsource
+  include_jack_netsource = include_directories('.', 'common/jack', 'common', 'posix')
+  link_flags_jack_netsource = []
+  # jack/inprocess
+  include_inprocess = include_directories('.', 'common/jack', 'common')
+  deps_inprocess += [lib_m]
+  link_flags_inprocess = []
 endif
 
 if os == 'darwin'
@@ -981,6 +1531,137 @@ if os == 'darwin'
     link_flags_jack_coremidi = []
     symbol_visibility_jack_coremidi = 'default'
   endif
+  # jack_freewheel
+  include_jack_freewheel = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_freewheel += [dep_foundation]
+  link_flags_jack_freewheel = []
+  # jack_connect
+  include_jack_connect = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_connect += [dep_foundation]
+  link_flags_jack_connect = []
+  # jack_lsp
+  include_jack_lsp = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_lsp += [dep_foundation]
+  link_flags_jack_lsp = []
+  # jack_metro
+  include_jack_metro = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_metro += [dep_foundation]
+  link_flags_jack_metro = []
+  # jack_midiseq
+  include_jack_midiseq = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_midiseq += [dep_foundation]
+  link_flags_jack_midiseq = []
+  # jack_midisine
+  include_jack_midisine = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_midisine += [dep_foundation]
+  link_flags_jack_midisine = []
+  # jack_showtime
+  include_jack_showtime = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_showtime += [dep_foundation]
+  link_flags_jack_showtime = []
+  # jack_simple_client
+  include_jack_simple_client = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_simple_client += [dep_foundation]
+  link_flags_jack_simple_client = []
+  # jack_zombie
+  include_jack_zombie = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_zombie += [dep_foundation]
+  link_flags_jack_zombie = []
+  # jack_load
+  include_jack_load = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_load += [dep_foundation]
+  link_flags_jack_load = []
+  # jack_unload
+  include_jack_unload = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_unload += [dep_foundation]
+  link_flags_jack_unload = []
+  # jack_alias
+  include_jack_alias = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_alias += [dep_foundation]
+  link_flags_jack_alias = []
+  # jack_bufsize
+  include_jack_bufsize = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_bufsize += [dep_foundation]
+  link_flags_jack_bufsize = []
+  # jack_wait
+  include_jack_wait = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_wait += [dep_foundation]
+  link_flags_jack_wait = []
+  # jack_samplerate
+  include_jack_samplerate = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_samplerate += [dep_foundation]
+  link_flags_jack_samplerate = []
+  # jack_evmon
+  include_jack_evmon = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_evmon += [dep_foundation]
+  link_flags_jack_evmon = []
+  # jack_monitor_client
+  include_jack_monitor_client = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_monitor_client += [dep_foundation]
+  link_flags_jack_monitor_client = []
+  # jack_thru
+  include_jack_thru = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_thru += [dep_foundation]
+  link_flags_jack_thru = []
+  # jack_cpu_load
+  include_jack_cpu_load = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_cpu_load += [dep_foundation]
+  link_flags_jack_cpu_load = []
+  # jack_simple_session_client
+  include_jack_simple_session_client = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_simple_session_client += [dep_foundation]
+  link_flags_jack_simple_session_client = []
+  # jack_session_notify
+  include_jack_session_notify = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_session_notify += [dep_foundation]
+  link_flags_jack_session_notify = []
+  # jack_server_control
+  include_jack_server_control = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_server_control += [dep_foundation]
+  link_flags_jack_server_control = []
+  # jack_net_slave
+  include_jack_net_slave = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_net_slave += [dep_foundation]
+  link_flags_jack_net_slave = []
+  # jack_net_master
+  include_jack_net_master = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_net_master += [dep_foundation]
+  link_flags_jack_net_master = []
+  # jack_latent_client
+  include_jack_latent_client = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_latent_client += [dep_foundation]
+  link_flags_jack_latent_client = []
+  # jack_midi_dump
+  include_jack_midi_dump = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_midi_dump += [dep_foundation]
+  link_flags_jack_midi_dump = []
+  # jack_midi_latency_test
+  include_jack_midi_latency_test = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_midi_latency_test += [dep_foundation]
+  link_flags_jack_midi_latency_test = []
+  # jack_simdtests
+  include_jack_simdtests = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_simdtests += [dep_foundation]
+  link_flags_jack_simdtests = []
+  # jack_property
+  include_jack_property = include_directories('.', 'common/jack', 'common', 'macosx', 'posix')
+  deps_jack_property += [dep_foundation]
+  link_flags_jack_property = []
+  # jack_transport
+  include_jack_transport = include_directories('.', 'common/jack', 'common')
+  deps_jack_transport += []
+  link_flags_jack_transport = []
+  # jack_rec
+  include_jack_rec = include_directories('.', 'common/jack', 'common')
+#  deps_jack_rec += [lib_rt]
+  link_flags_jack_rec = []
+  # jack_netsource
+  include_jack_netsource = include_directories('.', 'common/jack', 'common', 'posix')
+  link_flags_jack_netsource = []
+  # jack/inprocess
+  include_inprocess = include_directories('.', 'common/jack', 'common')
+#  deps_inprocess += [lib_m]
+  link_flags_inprocess = []
 endif
 
 if os == 'windows'
@@ -1486,6 +2167,19 @@ if os == 'windows' and dep_winmme.found()
     install_dir: join_paths(get_option('libdir'), 'jack')
   )
 endif
+lib__inprocess = library(
+  'inprocess',
+  name_prefix: '',
+  #  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
+  sources: src_inprocess,
+  include_directories: include_inprocess,
+  dependencies: deps_inprocess,
+  link_with: [lib_jackserver],
+  link_args: link_flags_inprocess,
+  #  gnu_symbol_visibility: symbol_visibility_inprocess,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
 
 # headers
 install_headers(
@@ -1541,7 +2235,366 @@ if os in ['darwin', 'linux', 'sunos'] and dep_dbus.found() and dep_expat.found()
     install: true
   )
 endif
-
+exe_jack_freewheel = executable(
+  'jack_freewheel',
+  cpp_args: cpp_args_common,
+  sources: src_jack_freewheel,
+  include_directories: include_jack_freewheel,
+  dependencies: deps_jack_freewheel,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_freewheel,
+  install: true
+)
+exe_jack_connect = executable(
+  'jack_connect',
+  cpp_args: cpp_args_common,
+  sources: src_jack_connect,
+  include_directories: include_jack_connect,
+  dependencies: deps_jack_connect,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_connect,
+  install: true
+)
+exe_jack_lsp = executable(
+  'jack_lsp',
+  cpp_args: cpp_args_common,
+  sources: src_jack_lsp,
+  include_directories: include_jack_lsp,
+  dependencies: deps_jack_lsp,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_lsp,
+  install: true
+)
+exe_jack_metro = executable(
+  'jack_metro',
+  cpp_args: cpp_args_common,
+  sources: src_jack_metro,
+  include_directories: include_jack_metro,
+  dependencies: deps_jack_metro,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_metro,
+  install: true
+)
+exe_jack_midiseq = executable(
+  'jack_midiseq',
+  cpp_args: cpp_args_common,
+  sources: src_jack_midiseq,
+  include_directories: include_jack_midiseq,
+  dependencies: deps_jack_midiseq,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_midiseq,
+  install: true
+)
+exe_jack_midisine = executable(
+  'jack_midisine',
+  cpp_args: cpp_args_common,
+  sources: src_jack_midisine,
+  include_directories: include_jack_midisine,
+  dependencies: deps_jack_midisine,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_midisine,
+  install: true
+)
+exe_jack_showtime = executable(
+  'jack_showtime',
+  cpp_args: cpp_args_common,
+  sources: src_jack_showtime,
+  include_directories: include_jack_showtime,
+  dependencies: deps_jack_showtime,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_showtime,
+  install: true
+)
+exe_jack_simple_client = executable(
+  'jack_simple_client',
+  cpp_args: cpp_args_common,
+  sources: src_jack_simple_client,
+  include_directories: include_jack_simple_client,
+  dependencies: deps_jack_simple_client,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_simple_client,
+  install: true
+)
+exe_jack_zombie = executable(
+  'jack_zombie',
+  cpp_args: cpp_args_common,
+  sources: src_jack_zombie,
+  include_directories: include_jack_zombie,
+  dependencies: deps_jack_zombie,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_zombie,
+  install: true
+)
+exe_jack_load = executable(
+  'jack_load',
+  cpp_args: cpp_args_common,
+  sources: src_jack_load,
+  include_directories: include_jack_load,
+  dependencies: deps_jack_load,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_load,
+  install: true
+)
+exe_jack_unload = executable(
+  'jack_unload',
+  cpp_args: cpp_args_common,
+  sources: src_jack_unload,
+  include_directories: include_jack_unload,
+  dependencies: deps_jack_unload,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_unload,
+  install: true
+)
+exe_jack_alias = executable(
+  'jack_alias',
+  cpp_args: cpp_args_common,
+  sources: src_jack_alias,
+  include_directories: include_jack_alias,
+  dependencies: deps_jack_alias,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_alias,
+  install: true
+)
+exe_jack_bufsize = executable(
+  'jack_bufsize',
+  cpp_args: cpp_args_common,
+  sources: src_jack_bufsize,
+  include_directories: include_jack_bufsize,
+  dependencies: deps_jack_bufsize,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_bufsize,
+  install: true
+)
+exe_jack_wait = executable(
+  'jack_wait',
+  cpp_args: cpp_args_common,
+  sources: src_jack_wait,
+  include_directories: include_jack_wait,
+  dependencies: deps_jack_wait,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_wait,
+  install: true
+)
+exe_jack_samplerate = executable(
+  'jack_samplerate',
+  cpp_args: cpp_args_common,
+  sources: src_jack_samplerate,
+  include_directories: include_jack_samplerate,
+  dependencies: deps_jack_samplerate,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_samplerate,
+  install: true
+)
+exe_jack_evmon = executable(
+  'jack_evmon',
+  cpp_args: cpp_args_common,
+  sources: src_jack_evmon,
+  include_directories: include_jack_evmon,
+  dependencies: deps_jack_evmon,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_evmon,
+  install: true
+)
+exe_jack_monitor_client = executable(
+  'jack_monitor_client',
+  cpp_args: cpp_args_common,
+  sources: src_jack_monitor_client,
+  include_directories: include_jack_monitor_client,
+  dependencies: deps_jack_monitor_client,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_monitor_client,
+  install: true
+)
+exe_jack_thru = executable(
+  'jack_thru',
+  cpp_args: cpp_args_common,
+  sources: src_jack_thru,
+  include_directories: include_jack_thru,
+  dependencies: deps_jack_thru,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_thru,
+  install: true
+)
+exe_jack_cpu_load = executable(
+  'jack_cpu_load',
+  cpp_args: cpp_args_common,
+  sources: src_jack_cpu_load,
+  include_directories: include_jack_cpu_load,
+  dependencies: deps_jack_cpu_load,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_cpu_load,
+  install: true
+)
+exe_jack_simple_session_client = executable(
+  'jack_simple_session_client',
+  cpp_args: cpp_args_common,
+  sources: src_jack_simple_session_client,
+  include_directories: include_jack_simple_session_client,
+  dependencies: deps_jack_simple_session_client,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_simple_session_client,
+  install: true
+)
+exe_jack_session_notify = executable(
+  'jack_session_notify',
+  cpp_args: cpp_args_common,
+  sources: src_jack_session_notify,
+  include_directories: include_jack_session_notify,
+  dependencies: deps_jack_session_notify,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_session_notify,
+  install: true
+)
+exe_jack_server_control = executable(
+  'jack_server_control',
+  cpp_args: cpp_args_common,
+  sources: src_jack_server_control,
+  include_directories: include_jack_server_control,
+  dependencies: deps_jack_server_control,
+  link_with: [lib_jackserver],
+  link_args: link_flags_jack_server_control,
+  install: true
+)
+exe_jack_net_slave = executable(
+  'jack_net_slave',
+  cpp_args: cpp_args_common,
+  sources: src_jack_net_slave,
+  include_directories: include_jack_net_slave,
+  dependencies: deps_jack_net_slave,
+  link_with: [lib_jacknet],
+  link_args: link_flags_jack_net_slave,
+  install: true
+)
+exe_jack_net_master = executable(
+  'jack_net_master',
+  cpp_args: cpp_args_common,
+  sources: src_jack_net_master,
+  include_directories: include_jack_net_master,
+  dependencies: deps_jack_net_master,
+  link_with: [lib_jacknet],
+  link_args: link_flags_jack_net_master,
+  install: true
+)
+exe_jack_latent_client = executable(
+  'jack_latent_client',
+  cpp_args: cpp_args_common,
+  sources: src_jack_latent_client,
+  include_directories: include_jack_latent_client,
+  dependencies: deps_jack_latent_client,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_latent_client,
+  install: true
+)
+exe_jack_midi_dump = executable(
+  'jack_midi_dump',
+  cpp_args: cpp_args_common,
+  sources: src_jack_midi_dump,
+  include_directories: include_jack_midi_dump,
+  dependencies: deps_jack_midi_dump,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_midi_dump,
+  install: true
+)
+exe_jack_midi_latency_test = executable(
+  'jack_midi_latency_test',
+  cpp_args: cpp_args_common,
+  sources: src_jack_midi_latency_test,
+  include_directories: include_jack_midi_latency_test,
+  dependencies: deps_jack_midi_latency_test,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_midi_latency_test,
+  install: true
+)
+exe_jack_simdtests = executable(
+  'jack_simdtests',
+  cpp_args: cpp_args_common,
+  sources: src_jack_simdtests,
+  include_directories: include_jack_simdtests,
+  dependencies: deps_jack_simdtests,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_simdtests,
+  install: true
+)
+exe_jack_property = executable(
+  'jack_property',
+  cpp_args: cpp_args_common,
+  sources: src_jack_property,
+  include_directories: include_jack_property,
+  dependencies: deps_jack_property,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_property,
+  install: true
+)
+exe_jack_transport = executable(
+  'jack_transport',
+  cpp_args: cpp_args_common,
+  sources: src_jack_transport,
+  include_directories: include_jack_transport,
+  dependencies: deps_jack_transport,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_transport,
+  install: true
+)
+exe_jack_rec = executable(
+  'jack_rec',
+  cpp_args: cpp_args_common,
+  sources: src_jack_rec,
+  include_directories: include_jack_rec,
+  dependencies: deps_jack_rec,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_rec,
+  install: true
+)
+exe_jack_netsource = executable(
+  'jack_netsource',
+  c_args: ['-DNO_JACK_ERROR'],
+  cpp_args: cpp_args_common,
+  sources: src_jack_netsource,
+  include_directories: include_jack_netsource,
+  dependencies: deps_jack_netsource,
+  link_with: [lib_jack],
+  link_args: link_flags_jack_netsource,
+  install: true
+)
+if os == 'linux'
+  exe_alsa_in = executable(
+    'alsa_in',
+    c_args: ['-DNO_JACK_ERROR'],
+    cpp_args: cpp_args_common,
+    sources: src_alsa_in,
+    include_directories: include_alsa_in,
+    dependencies: deps_alsa_in,
+    link_with: [lib_jack],
+    link_args: link_flags_alsa_in,
+    install: true
+  )
+  exe_alsa_out = executable(
+    'alsa_out',
+    c_args: ['-DNO_JACK_ERROR'],
+    cpp_args: cpp_args_common,
+    sources: src_alsa_out,
+    include_directories: include_alsa_out,
+    dependencies: deps_alsa_out,
+    link_with: [lib_jack],
+    link_args: link_flags_alsa_out,
+    install: true
+  )
+endif
+if os != 'windows'
+  configure_file(
+    input: 'example-clients/jack_control',
+    output: 'jack_control',
+    copy: true,
+    install: true,
+    install_dir: get_option('bindir')
+  )
+  meson.add_install_script(
+    'tools/meson_create_symlink',
+    get_option('bindir'),
+    'jack_connect',
+    'jack_disconnect'
+  )
+endif
 
 # system integration
 if os == 'linux' and dep_systemd.found()
