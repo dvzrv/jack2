@@ -25,7 +25,15 @@ done
 
 # create man pages from templates
 for man_page in "$MESON_BUILD_ROOT/"*.1; do
-  sed -e "s/!VERSION!/${version}/g" \
-      -e "s/!DATE!/${date}/g" \
-      -i "${man_page}"
+  # sed on macOS is super ancient
+  if test "${os#*darwin}" != "${os}"; then
+    sed -i '' \
+        -e "s/!VERSION!/${version}/g" \
+        -e "s/!DATE!/${date}/g" \
+        "${man_page}"
+  else
+    sed -e "s/!VERSION!/${version}/g" \
+        -e "s/!DATE!/${date}/g" \
+        -i "${man_page}"
+  fi
 done
