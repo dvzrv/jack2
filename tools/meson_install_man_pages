@@ -8,4 +8,4 @@ set -eu
 man_dir="$1"
 
 install -vDm 644 "$MESON_BUILD_ROOT"/*.1 \
-        -t "${MESON_INSTALL_DESTDIR_PREFIX}/${man_dir}"
+        -t "${MESON_INSTALL_DESTDIR_PREFIX}/${man_dir}/man1"
