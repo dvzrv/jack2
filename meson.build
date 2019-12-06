@@ -1841,6 +1841,105 @@ if os == 'windows'
     link_flags_jack_winmme = []
     symbol_visibility_jack_winmme = 'default'
   endif
+  # jack_freewheel
+  include_jack_freewheel = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_freewheel = []
+  # jack_connect
+  include_jack_connect = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_connect = []
+  # jack_lsp
+  include_jack_lsp = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_lsp = []
+  # jack_metro
+  include_jack_metro = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_metro = []
+  # jack_midiseq
+  include_jack_midiseq = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_midiseq = []
+  # jack_midisine
+  include_jack_midisine = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_midisine = []
+  # jack_showtime
+  include_jack_showtime = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_showtime = []
+  # jack_simple_client
+  include_jack_simple_client = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_simple_client = []
+  # jack_zombie
+  include_jack_zombie = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_zombie = []
+  # jack_load
+  include_jack_load = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_load = []
+  # jack_unload
+  include_jack_unload = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_unload = []
+  # jack_alias
+  include_jack_alias = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_alias = []
+  # jack_bufsize
+  include_jack_bufsize = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_bufsize = []
+  # jack_wait
+  include_jack_wait = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_wait = []
+  # jack_samplerate
+  include_jack_samplerate = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_samplerate = []
+  # jack_evmon
+  include_jack_evmon = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_evmon = []
+  # jack_monitor_client
+  include_jack_monitor_client = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_monitor_client = []
+  # jack_thru
+  include_jack_thru = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_thru = []
+  # jack_cpu_load
+  include_jack_cpu_load = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_cpu_load = []
+  # jack_simple_session_client
+  include_jack_simple_session_client = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_simple_session_client = []
+  # jack_session_notify
+  include_jack_session_notify = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_session_notify = []
+  # jack_server_control
+  include_jack_server_control = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_server_control = []
+  # jack_net_slave
+  include_jack_net_slave = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_net_slave = []
+  # jack_net_master
+  include_jack_net_master = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_net_master = []
+  # jack_latent_client
+  include_jack_latent_client = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_latent_client = []
+  # jack_midi_dump
+  include_jack_midi_dump = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_midi_dump = []
+  # jack_midi_latency_test
+  include_jack_midi_latency_test = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_midi_latency_test = []
+  # jack_simdtests
+  include_jack_simdtests = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_simdtests = []
+  # jack_property
+  include_jack_property = include_directories('.', 'common/jack', 'common', 'windows')
+  link_flags_jack_property = []
+  # jack_transport
+  include_jack_transport = include_directories('.', 'common/jack', 'common')
+  link_flags_jack_transport = []
+  # jack_rec
+  include_jack_rec = include_directories('.', 'common/jack', 'common')
+  link_flags_jack_rec = []
+  # jack_netsource
+  include_jack_netsource = include_directories('.', 'common/jack', 'common', 'posix')
+  link_flags_jack_netsource = []
+  # jack/inprocess
+  include_inprocess = include_directories('.', 'common/jack', 'common')
+  link_flags_inprocess = []
 endif
 
 if os in ['darwin', 'linux', 'sunos']
