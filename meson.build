@@ -2716,6 +2716,18 @@ if os == 'linux' and dep_systemd.found()
   )
 endif
 
+if os in ['darwin', 'linux', 'sunos']
+  meson.add_postconf_script(
+    'tools/meson_create_man_pages',
+    conf_data.get('version'),
+    'test'
+  )
+  meson.add_install_script(
+    'tools/meson_install_man_pages',
+    get_option('mandir')
+  )
+endif
+
 if os in ['darwin', 'linux', 'sunos'] and dep_dbus.found() and dep_expat.found()
   config_dbus = configuration_data(
     {'BINDIR': join_paths(get_option('prefix'), get_option('bindir'))}
