@@ -2738,6 +2738,7 @@ if os != 'windows'
   exe_jack_cpu = executable(
     'jack_cpu',
     sources: src_jack_cpu,
+    include_directories: ['common'],
     dependencies: deps_jack_cpu,
     link_with: [lib_jack],
     install: true
@@ -2746,6 +2747,7 @@ if os != 'windows'
     'jack_iodelay',
     cpp_args: cpp_args_common,
     sources: src_jack_iodelay,
+    include_directories: ['common'],
     dependencies: deps_jack_iodelay,
     link_with: [lib_jack],
     install: true
@@ -2754,6 +2756,7 @@ if os != 'windows'
     'jack_multiple_metro',
     cpp_args: cpp_args_common,
     sources: src_jack_multiple_metro,
+    include_directories: ['common'],
     dependencies: deps_jack_multiple_metro,
     link_with: [lib_jack],
     install: true
