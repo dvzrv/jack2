@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+#
+# Installs the HTML documentation generated in $MESON_BUILD_ROOT/html/ to the
+# target file system with the help of MESON_INSTALL_DESTDIR_PREFIX specifying
+# the DESTDIR and PREFIX, while considering datadir ($1) and the project_name
+# ($2).
+
+set -eu
+
+data_dir="$1"
+project_name="$2"
+
+install -vDm 644 "${MESON_BUILD_ROOT}/html/"*.css \
+  "${MESON_BUILD_ROOT}/html/"*.html \
+  "${MESON_BUILD_ROOT}/html/"*.js \
+  "${MESON_BUILD_ROOT}/html/"*.png \
+  -t "${MESON_INSTALL_DESTDIR_PREFIX}/${data_dir}/doc/${project_name}/html"
