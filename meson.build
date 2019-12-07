@@ -76,7 +76,7 @@ if os in ['darwin', 'linux', 'sunos']
   dep_expat = dependency('expat', required: get_option('dbus'), disabler: true)
 endif
 
-doxygen = find_program('doxygen', required : get_option('doxygen'), disabler: true)
+prog_doxygen = find_program('doxygen', required : get_option('doxygen'), disabler: true)
 
 # sources for libjack
 src_common = [
@@ -2805,3 +2805,9 @@ if os in ['darwin', 'linux', 'sunos'] and dep_dbus.found() and dep_expat.found()
     configuration: config_dbus
   )
 endif
+
+# documentation
+run_command(
+  prog_doxygen,
+  env: ['VERSION=' + conf_data.get('version')]
+)
