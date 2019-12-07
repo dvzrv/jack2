@@ -2814,3 +2814,9 @@ run_command(
   prog_doxygen,
   env: ['VERSION=' + conf_data.get('version')]
 )
+if prog_doxygen.found()
+  meson.add_install_script(
+    'tools/meson_install_documentation',
+    get_option('datadir'),
+    meson.project_name())
+endif
