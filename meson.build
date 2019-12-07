@@ -629,6 +629,18 @@ src_alsa_out = [
 # sources for inprocess
 src_inprocess = ['example-clients/inprocess.c']
 
+# sources for jack_test
+src_jack_test = ['tests/test.cpp']
+
+# sources for jack_cpu
+src_jack_cpu = ['tests/cpu.c']
+
+# sources for jack_iodelay
+src_jack_iodelay = ['tests/iodelay.cpp']
+
+# sources for jack_multiple_metro
+src_jack_multiple_metro = ['tests/external_metro.cpp']
+
 # cpp_args
 cpp_args_common = [
   '-DCLIENT_NUM=@0@'.format(conf_data.get('clients')),
@@ -809,6 +821,18 @@ deps_alsa_out = [dep_samplerate, lib_m]
 
 # dependencies for inprocess
 deps_inprocess = []
+
+# dependencies for jack_test
+deps_jack_test = []
+
+# dependencies for jack_cpu
+deps_jack_cpu = []
+
+# dependencies for jack_iodelay
+deps_jack_iodelay = []
+
+# dependencies for jack_multiple_metro
+deps_jack_multiple_metro = []
 
 if dep_celt.found()
   message('Compiling libjack, libjackserver, libjacknet, jack/jack_netone and jack_netsource with legacy celt support.')
@@ -1118,6 +1142,15 @@ if os == 'linux'
   # jack/inprocess
   include_inprocess = include_directories('.', 'common/jack', 'common')
   link_flags_inprocess = []
+  # jack_test
+  include_jack_test = include_directories('common/jack', 'common')
+  deps_jack_test += [lib_rt]
+  # jack_cpu
+  deps_jack_cpu += [lib_rt]
+  # jack_iodelay
+  deps_jack_iodelay += [lib_rt]
+  # jack_multiple_metro
+  deps_jack_multiple_metro += [lib_rt]
 endif
 
 if os == 'sunos'
@@ -1662,6 +1695,8 @@ if os == 'darwin'
   include_inprocess = include_directories('.', 'common/jack', 'common')
 #  deps_inprocess += [lib_m]
   link_flags_inprocess = []
+  # jack_test
+  include_jack_test = include_directories('common/jack', 'common')
 endif
 
 if os == 'windows'
@@ -2052,6 +2087,17 @@ lib_audioadapter = library(
   install: true,
   install_dir: join_paths(get_option('libdir'), 'jack')
 )
+lib_inprocess = library(
+  'inprocess',
+  name_prefix: '',
+  sources: src_inprocess,
+  include_directories: include_inprocess,
+  dependencies: deps_inprocess,
+  link_with: [lib_jackserver],
+  link_args: link_flags_inprocess,
+  install: true,
+  install_dir: join_paths(get_option('libdir'), 'jack')
+)
 
 # drivers
 lib_jack_dummy = library(
@@ -2266,19 +2312,6 @@ if os == 'windows' and dep_winmme.found()
     install_dir: join_paths(get_option('libdir'), 'jack')
   )
 endif
-lib__inprocess = library(
-  'inprocess',
-  name_prefix: '',
-  #  cpp_args: cpp_args_common + ['-DSERVER_SIDE'],
-  sources: src_inprocess,
-  include_directories: include_inprocess,
-  dependencies: deps_inprocess,
-  link_with: [lib_jackserver],
-  link_args: link_flags_inprocess,
-  #  gnu_symbol_visibility: symbol_visibility_inprocess,
-  install: true,
-  install_dir: join_paths(get_option('libdir'), 'jack')
-)
 
 # headers
 install_headers(
@@ -2693,6 +2726,38 @@ if os != 'windows'
     'jack_connect',
     'jack_disconnect'
   )
+  exe_jack_test = executable(
+    'jack_test',
+    cpp_args: cpp_args_common,
+    sources: src_jack_test,
+    include_directories: ['common'],
+    dependencies: deps_jack_test,
+    link_with: [lib_jack],
+    install: true
+  )
+  exe_jack_cpu = executable(
+    'jack_cpu',
+    sources: src_jack_cpu,
+    dependencies: deps_jack_cpu,
+    link_with: [lib_jack],
+    install: true
+  )
+  exe_jack_iodelay = executable(
+    'jack_iodelay',
+    cpp_args: cpp_args_common,
+    sources: src_jack_iodelay,
+    dependencies: deps_jack_iodelay,
+    link_with: [lib_jack],
+    install: true
+  )
+  exe_jack_multiple_metro = executable(
+    'jack_multiple_metro',
+    cpp_args: cpp_args_common,
+    sources: src_jack_multiple_metro,
+    dependencies: deps_jack_multiple_metro,
+    link_with: [lib_jack],
+    install: true
+  )
 endif
 
 # system integration
@@ -2720,7 +2785,7 @@ if os in ['darwin', 'linux', 'sunos']
   meson.add_postconf_script(
     'tools/meson_create_man_pages',
     conf_data.get('version'),
-    'test'
+    os
   )
   meson.add_install_script(
     'tools/meson_install_man_pages',
