@@ -21,10 +21,14 @@ endif
 # c library dependencies
 lib_dl = meson.get_compiler('c').find_library('dl')
 lib_m = meson.get_compiler('c').find_library('m')
-lib_db = meson.get_compiler('c').find_library('db')
+if os == 'freebsd'
+  lib_db = meson.get_compiler('c').find_library('db-5')
+else
+  lib_db = meson.get_compiler('c').find_library('db')
+endif
 lib_stdcpp = meson.get_compiler('cpp').find_library('stdc++')
 
-if os in ['linux', 'sunos']
+if os in ['freebsd', 'linux', 'sunos']
   lib_rt = meson.get_compiler('c').find_library('rt')
 endif
 
@@ -40,7 +44,7 @@ dep_samplerate = dependency('samplerate')
 dep_sndfile = dependency('sndfile')
 dep_threads = dependency('threads')
 
-if os == 'sunos'
+if os in ['freebsd', 'sunos']
   dep_oss = dependency('oss', required: get_option('oss'))
 endif
 
@@ -71,7 +75,7 @@ if os == 'linux'
   dep_systemd = dependency('systemd', required: get_option('systemd'), disabler: true)
 endif
 
-if os in ['darwin', 'linux', 'sunos']
+if os in ['darwin', 'freebsd', 'linux', 'sunos']
   dep_dbus = dependency('dbus-1', version: '>=1.0.0', required: get_option('dbus'), disabler: true)
   dep_expat = dependency('expat', required: get_option('dbus'), disabler: true)
 endif
@@ -1153,7 +1157,7 @@ if os == 'linux'
   deps_jack_multiple_metro += [lib_rt]
 endif
 
-if os == 'sunos'
+if os in ['freebsd', 'sunos']
   src_common_sunos += [
     'common/JackDebugClient.cpp',
     'common/timestamps.c',
@@ -2784,7 +2788,7 @@ if os == 'linux' and dep_systemd.found()
   )
 endif
 
-if os in ['darwin', 'linux', 'sunos']
+if os in ['darwin', 'freebsd', 'linux', 'sunos']
   meson.add_postconf_script(
     'tools/meson_create_man_pages',
     conf_data.get('version'),
@@ -2796,7 +2800,7 @@ if os in ['darwin', 'linux', 'sunos']
   )
 endif
 
-if os in ['darwin', 'linux', 'sunos'] and dep_dbus.found() and dep_expat.found()
+if os in ['darwin', 'freebsd', 'linux', 'sunos'] and dep_dbus.found() and dep_expat.found()
   config_dbus = configuration_data(
     {'BINDIR': join_paths(get_option('prefix'), get_option('bindir'))}
   )
