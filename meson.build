@@ -1253,7 +1253,7 @@ if os in ['freebsd', 'sunos']
   link_flags_jack_net = []
   symbol_visibility_jack_net = 'default'
   # jack/jack_netone
-  src_jack_net_sunos = ['solaris/JackSolarisTime.c']
+  src_jack_netone_sunos = ['solaris/JackSolarisTime.c']
   src_jack_netone += src_jack_netone_posix + src_jack_netone_sunos
   include_jack_netone = include_directories('.', 'common/jack', 'common', 'posix', 'solaris')
   link_flags_jack_netone = []
