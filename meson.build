@@ -1158,7 +1158,7 @@ if os == 'linux'
 endif
 
 if os in ['freebsd', 'sunos']
-  src_common_sunos += [
+  src_common_sunos = [
     'common/JackDebugClient.cpp',
     'common/timestamps.c',
     'common/promiscuous.c',
