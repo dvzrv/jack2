@@ -22,7 +22,7 @@ endif
 lib_dl = meson.get_compiler('c').find_library('dl')
 lib_m = meson.get_compiler('c').find_library('m')
 if os == 'freebsd'
-  lib_db = meson.get_compiler('c').find_library('db-5')
+  lib_db = meson.get_compiler('c').find_library('db-5', dirs: ['/usr/lib', '/usr/local/lib'])
 else
   lib_db = meson.get_compiler('c').find_library('db')
 endif
