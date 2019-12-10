@@ -1264,14 +1264,14 @@ if os in ['freebsd', 'sunos']
     message('Building boomer and OSS drivers.')
     # jack/jack_boomer
     src_jack_boomer_sunos = ['solaris/JackSolarisTime.c']
-    src_jack_boomer += src_jack_boomer_posix + src_jack_boomer_sunos
+    src_jack_boomer += src_jack_boomer_sunos
     include_jack_boomer = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
     deps_jack_boomer += [lib_dl]
     link_flags_jack_boomer = []
     symbol_visibility_jack_boomer = 'default'
     # jack/jack_oss
     src_jack_oss_sunos = ['solaris/JackSolarisTime.c']
-    src_jack_oss += src_jack_oss_posix + src_jack_oss_sunos
+    src_jack_oss += src_jack_oss_sunos
     include_jack_oss = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
     deps_jack_oss += [lib_dl]
     link_flags_jack_oss = []
