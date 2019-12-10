@@ -44,10 +44,6 @@ dep_samplerate = dependency('samplerate')
 dep_sndfile = dependency('sndfile')
 dep_threads = dependency('threads')
 
-if os in ['freebsd', 'sunos']
-  dep_oss = dependency('oss', required: get_option('oss'))
-endif
-
 if os == 'darwin'
   dep_accelerate = dependency('Accelerate', method: 'extraframework', disabler: true)
   dep_audiounit = dependency('AudioUnit', method: 'extraframework', disabler: true)
@@ -1217,14 +1213,13 @@ if os in ['freebsd', 'sunos']
   link_flags_netadapter = []
   symbol_visibility_netadapter = 'hidden'
   # jack/audioadapter
-  if dep_oss.found()
+  if get_option('oss')
     src_audioadapter_sunos = [
       'common/memops.c',
       'solaris/oss/JackOSSAdapter.cpp',
     ]
     src_audioadapter += src_audioadapter_posix + src_audioadapter_sunos
     include_audioadapter = include_directories('.', 'common/jack', 'common', 'posix', 'solaris', 'solaris/oss')
-    deps_audioadapter += [dep_oss]
     link_flags_audioadapter = []
     symbol_visibility_audioadapter = 'hidden'
   endif
@@ -1265,7 +1260,7 @@ if os in ['freebsd', 'sunos']
   deps_jack_proxy += [lib_dl]
   link_flags_jack_proxy = []
   symbol_visibility_jack_proxy = 'default'
-  if dep_oss.found()
+  if get_option('oss')
     message('Building boomer and OSS drivers.')
     # jack/jack_boomer
     src_jack_boomer_sunos = ['solaris/JackSolarisTime.c']
@@ -2258,7 +2253,7 @@ if os == 'darwin' and dep_audiounit.found() and dep_coremidi.found() and dep_cor
     install_dir: join_paths(get_option('libdir'), 'jack')
   )
 endif
-if os == 'sunos' and dep_oss.found()
+if os in ['freebsd', 'sunos'] and get_option('oss')
   lib_jack_oss = library(
     'jack_oss',
     name_prefix: '',

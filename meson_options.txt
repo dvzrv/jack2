@@ -4,7 +4,7 @@ option('celt', type: 'feature', value: 'auto', description: 'Celt support (legac
 option('dbus', type: 'feature', value: 'auto', description: 'D-Bus support')
 option('ffado', type: 'feature', value: 'auto', description: 'FFADO support')
 option('iio', type: 'feature', value: 'auto', description: 'IIO support')
-option('oss', type: 'feature', value: 'auto', description: 'OSS support')
+option('oss', type: 'boolean', value: 'false', description: 'OSS support')
 option('portaudio', type: 'feature', value: 'auto', description: 'PortAudio support')
 option('systemd', type: 'feature', value: 'auto', description: 'Systemd integration')
 option('winmme', type: 'feature', value: 'auto', description: 'WinMME support')
