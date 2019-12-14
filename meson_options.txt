@@ -5,6 +5,7 @@ option('db', type: 'feature', value: 'auto', description: 'Metadata support (Ber
 option('dbus', type: 'feature', value: 'auto', description: 'D-Bus support')
 option('ffado', type: 'feature', value: 'auto', description: 'FFADO support')
 option('iio', type: 'feature', value: 'auto', description: 'IIO support')
+option('opus', type: 'feature', value: 'auto', description: 'Opus support')
 option('oss', type: 'boolean', value: 'true', description: 'OSS support')
 option('portaudio', type: 'feature', value: 'auto', description: 'PortAudio support')
 option('systemd', type: 'feature', value: 'auto', description: 'Systemd integration')
