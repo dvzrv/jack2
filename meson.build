@@ -41,7 +41,6 @@ endif
 # package dependencies
 dep_celt = dependency('celt', version: '>=0.11.0', required: get_option('celt'))
 dep_opus = dependency('opus', version: '>=0.9.0', required: get_option('opus'))
-dep_readline = dependency('readline')
 dep_samplerate = dependency('samplerate')
 dep_sndfile = dependency('sndfile')
 dep_threads = dependency('threads')
@@ -76,6 +75,7 @@ endif
 if os in ['darwin', 'freebsd', 'linux', 'sunos']
   dep_dbus = dependency('dbus-1', version: '>=1.0.0', required: get_option('dbus'), disabler: true)
   dep_expat = dependency('expat', required: get_option('dbus'), disabler: true)
+  dep_readline = dependency('readline')
 endif
 
 prog_doxygen = find_program('doxygen', required : get_option('doxygen'), disabler: true)
@@ -807,7 +807,7 @@ deps_jack_simdtests = []
 deps_jack_property = []
 
 # dependencies for jack_transport
-deps_jack_transport = [dep_readline]
+deps_jack_transport = []
 
 # dependencies for jack_rec
 deps_jack_rec = [dep_sndfile, dep_threads]
@@ -1124,7 +1124,7 @@ if os == 'linux'
   link_flags_jack_property = []
   # jack_transport
   include_jack_transport = include_directories('.', 'common/jack', 'common')
-  deps_jack_transport += [lib_rt]
+  deps_jack_transport += [dep_readline, lib_rt]
   link_flags_jack_transport = []
   # jack_rec
   include_jack_rec = include_directories('.', 'common/jack', 'common')
@@ -1397,7 +1397,7 @@ if os in ['freebsd', 'sunos']
   link_flags_jack_property = []
   # jack_transport
   include_jack_transport = include_directories('.', 'common/jack', 'common')
-  deps_jack_transport += []
+  deps_jack_transport += [dep_readline]
   link_flags_jack_transport = []
   # jack_rec
   include_jack_rec = include_directories('.', 'common/jack', 'common')
@@ -1683,7 +1683,7 @@ if os == 'darwin'
   link_flags_jack_property = []
   # jack_transport
   include_jack_transport = include_directories('.', 'common/jack', 'common')
-  deps_jack_transport += []
+  deps_jack_transport += [dep_readline]
   link_flags_jack_transport = []
   # jack_rec
   include_jack_rec = include_directories('.', 'common/jack', 'common')
