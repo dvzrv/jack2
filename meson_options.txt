@@ -1,6 +1,7 @@
 option('alsa', type: 'feature', value: 'auto', description: 'ALSA support')
 option('autostart-method', type: 'string', value: 'classic', description: 'Set client autostart method (classic or dbus)')
 option('celt', type: 'feature', value: 'auto', description: 'Celt support (legacy)')
+option('db', type: 'feature', value: 'auto', description: 'Metadata support (Berkeley DB)')
 option('dbus', type: 'feature', value: 'auto', description: 'D-Bus support')
 option('ffado', type: 'feature', value: 'auto', description: 'FFADO support')
 option('iio', type: 'feature', value: 'auto', description: 'IIO support')
