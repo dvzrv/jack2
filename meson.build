@@ -24,9 +24,9 @@ if os in ['darwin', 'freebsd', 'linux', 'sunos']
 endif
 lib_m = meson.get_compiler('c').find_library('m')
 if os == 'freebsd'
-  lib_db = meson.get_compiler('c').find_library('db-5', dirs: ['/usr/lib', '/usr/local/lib'])
+  lib_db = meson.get_compiler('c').find_library('db-5', dirs: ['/usr/lib', '/usr/local/lib'], required: get_option('db'))
 else
-  lib_db = meson.get_compiler('c').find_library('db')
+  lib_db = meson.get_compiler('c').find_library('db', required: get_option('db'))
 endif
 lib_stdcpp = meson.get_compiler('cpp').find_library('stdc++')
 
