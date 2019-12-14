@@ -40,7 +40,7 @@ endif
 
 # package dependencies
 dep_celt = dependency('celt', version: '>=0.11.0', required: get_option('celt'))
-dep_opus = dependency('opus', version: '>=0.9.0')
+dep_opus = dependency('opus', version: '>=0.9.0', required: get_option('opus'))
 dep_readline = dependency('readline')
 dep_samplerate = dependency('samplerate')
 dep_sndfile = dependency('sndfile')
